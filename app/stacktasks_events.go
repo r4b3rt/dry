@@ -3,8 +3,8 @@ package app
 import (
 	"fmt"
 
-	"github.com/moncho/dry/appui/swarm"
 	"github.com/gdamore/tcell"
+	"github.com/moncho/dry/appui/swarm"
 )
 
 type stackTasksScreenEventHandler struct {
@@ -29,7 +29,7 @@ func (h *stackTasksScreenEventHandler) handle(event *tcell.EventKey, f func(even
 		f(forwarder)
 		if err := h.widget.OnEvent(
 			inspect(
-				h.screen,
+				h.dry.screen,
 				forwarder.events(),
 				func(id string) (interface{}, error) {
 					return h.dry.dockerDaemon.Task(id)
@@ -56,7 +56,7 @@ func (h *stackTasksScreenEventHandler) handle(event *tcell.EventKey, f func(even
 			}
 			f(h)
 		}
-		showFilterInput(newEventSource(forwarder.events()), applyFilter)
+		showFilterInput(h.dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 	}
 
 	if handled {

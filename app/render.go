@@ -10,7 +10,7 @@ import (
 )
 
 //render renders dry on the given screen
-func render(d *Dry, screen *ui.Screen) {
+func render(d *Dry) {
 
 	var bufferers []gizaktermui.Bufferer
 
@@ -26,7 +26,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			cMenu := widgets.ContainerMenu
 			if err := cMenu.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, cMenu)
 
@@ -37,7 +37,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			containersWidget := widgets.ContainerList
 			if err := containersWidget.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, containersWidget)
 			keymap = keyMappings
@@ -48,7 +48,7 @@ func render(d *Dry, screen *ui.Screen) {
 
 			widget := widgets.ImageList
 			if err := widget.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, widget)
 
@@ -59,7 +59,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			widget := widgets.Networks
 			if err := widget.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, widget)
 			keymap = networkKeyMappings
@@ -68,7 +68,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			nodes := widgets.Nodes
 			if err := nodes.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, nodes)
 			keymap = nodeKeyMappings
@@ -77,7 +77,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			servicesWidget := widgets.ServiceList
 			if err := servicesWidget.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, servicesWidget)
 			keymap = serviceKeyMappings
@@ -86,7 +86,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			tasks := widgets.NodeTasks
 			if err := tasks.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, tasks)
 			keymap = swarmMapping
@@ -95,7 +95,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			tasks := widgets.ServiceTasks
 			if err := tasks.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, tasks)
 			keymap = swarmMapping
@@ -104,7 +104,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			stacks := widgets.Stacks
 			if err := stacks.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, stacks)
 			keymap = stackKeyMappings
@@ -113,7 +113,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			tasks := widgets.StackTasks
 			if err := tasks.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, tasks)
 			keymap = swarmMapping
@@ -133,7 +133,7 @@ func render(d *Dry, screen *ui.Screen) {
 		{
 			volumes := widgets.Volumes
 			if err := volumes.Mount(); err != nil {
-				screen.Render(1, err.Error())
+				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, volumes)
 			keymap = volumesKeyMappings
@@ -143,16 +143,16 @@ func render(d *Dry, screen *ui.Screen) {
 	bufferers = append(bufferers, footer(keymap))
 
 	widgets.MessageBar.Render()
-	screen.RenderBufferer(bufferers...)
+	d.screen.RenderBufferer(bufferers...)
 	if viewRenderer != nil {
-		screen.Render(appui.MainScreenHeaderSize, viewRenderer.String())
+		d.screen.Render(appui.MainScreenHeaderSize, viewRenderer.String())
 	}
 
 	for _, widget := range widgets.activeWidgets() {
-		screen.RenderBufferer(widget)
+		d.screen.RenderBufferer(widget)
 	}
 
-	screen.Flush()
+	d.screen.Flush()
 }
 
 func footer(mapping string) *termui.MarkupPar {
@@ -167,9 +167,4 @@ func footer(mapping string) *termui.MarkupPar {
 	par.Bg = gizaktermui.Attribute(appui.DryTheme.Footer)
 
 	return par
-}
-
-//Updates the cursor position in case it is out of bounds
-func updateCursorPosition(cursor *ui.Cursor, noOfElements int) {
-	cursor.Max(noOfElements - 1)
 }

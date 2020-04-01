@@ -14,6 +14,11 @@ import (
 	gizaktermui "github.com/gizak/termui"
 )
 
+// ContainerSource interface to retrieve a list of containers maching filters.
+type ContainerSource interface {
+	Containers([]docker.ContainerFilter, docker.SortMode) []*docker.Container
+}
+
 // the default length of a widget header
 const widgetHeaderLength = 4
 
@@ -31,7 +36,7 @@ var containerTableHeaders = []SortableColumnHeader{
 
 //ContainersWidget shows information containers
 type ContainersWidget struct {
-	dockerDaemon         docker.ContainerAPI
+	source               ContainerSource
 	totalRows            []*ContainerRow
 	filteredRows         []*ContainerRow
 	header               *termui.TableHeader
@@ -47,9 +52,9 @@ type ContainersWidget struct {
 }
 
 //NewContainersWidget creates a ContainersWidget
-func NewContainersWidget(dockerDaemon docker.ContainerAPI, s Screen) *ContainersWidget {
+func NewContainersWidget(source ContainerSource, s Screen) *ContainersWidget {
 	return &ContainersWidget{
-		dockerDaemon:      dockerDaemon,
+		source:            source,
 		header:            defaultContainerTableHeader,
 		screen:            s,
 		showAllContainers: false,
@@ -120,7 +125,7 @@ func (s *ContainersWidget) Mount() error {
 	} else {
 		filters = append(filters, docker.ContainerFilters.Running())
 	}
-	dockerContainers := s.dockerDaemon.Containers(filters, s.sortMode)
+	dockerContainers := s.source.Containers(filters, s.sortMode)
 
 	rows := make([]*ContainerRow, len(dockerContainers))
 	for i, container := range dockerContainers {

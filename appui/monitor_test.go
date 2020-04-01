@@ -30,11 +30,9 @@ func (screenBuffererRender) Cursor() *ui.Cursor {
 	return &ui.Cursor{}
 }
 
-func (screenBuffererRender) Flush() *ui.Screen {
-	return nil
+func (screenBuffererRender) Flush() {
 }
 func (screenBuffererRender) RenderBufferer(bs ...termui.Bufferer) {
-
 }
 
 func TestMonitor_RepeatedUnmount(t *testing.T) {

@@ -2,6 +2,7 @@ package docker
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"path/filepath"
@@ -13,7 +14,6 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	drytls "github.com/moncho/dry/tls"
 	"github.com/moncho/dry/version"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -30,12 +30,12 @@ var headers = map[string]string{
 func init() {
 	defaultDockerPath, _ = homedir.Expand("~/.docker")
 }
-func connect(client client.APIClient, env Env) (*DockerDaemon, error) {
+func connect(client client.APIClient, env Env) (*Daemon, error) {
 	store, err := NewDockerContainerStore(client)
 	if err != nil {
 		return nil, err
 	}
-	d := &DockerDaemon{
+	d := &Daemon{
 		client:    client,
 		err:       err,
 		s:         store,
@@ -86,11 +86,11 @@ func newHTTPClient(host string, config *tls.Config) (*http.Client, error) {
 }
 
 //ConnectToDaemon connects to a Docker daemon using the given properties.
-func ConnectToDaemon(env Env) (*DockerDaemon, error) {
+func ConnectToDaemon(env Env) (*Daemon, error) {
 
 	host, err := getServerHost(env)
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid Host")
+		return nil, fmt.Errorf("invalid Host: %v", err)
 	}
 	var tlsConfig *tls.Config
 	//If a path to certificates is given use the path to read certificates from
@@ -103,7 +103,7 @@ func ConnectToDaemon(env Env) (*DockerDaemon, error) {
 		}
 		tlsConfig, err = drytls.Client(options)
 		if err != nil {
-			return nil, errors.Wrap(err, "TLS setup error")
+			return nil, fmt.Errorf("TLS setup error: %v", err)
 		}
 	} else if env.DockerTLSVerify {
 		//No cert path is given but TLS verify is set, default location for
@@ -119,17 +119,17 @@ func ConnectToDaemon(env Env) (*DockerDaemon, error) {
 		env.DockerCertPath = defaultDockerPath
 		tlsConfig, err = drytls.Client(options)
 		if err != nil {
-			return nil, errors.Wrap(err, "TLS setup error")
+			return nil, fmt.Errorf("TLS setup error: %w", err)
 		}
 	}
 	httpClient, err := newHTTPClient(host, tlsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "HttpClient creation error")
+		return nil, fmt.Errorf("httpClient creation error: %w", err)
 	}
 
 	client, err := client.NewClient(host, env.DockerAPIVersion, httpClient, headers)
 	if err == nil {
 		return connect(client, env)
 	}
-	return nil, errors.Wrap(err, "Error creating client")
+	return nil, fmt.Errorf("error creating client: %w", err)
 }

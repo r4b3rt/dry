@@ -38,7 +38,7 @@ func (c timedOutImageAPIClientMock) ImagesPrune(ctx context.Context, f filters.A
 		return dockerTypes.ImagesPruneReport{}, ctx.Err()
 	}
 }
-func TestDockerDaemon_RemoveUnusedImages(t *testing.T) {
+func TestDaemon_RemoveUnusedImages(t *testing.T) {
 	type fields struct {
 		client dockerAPI.APIClient
 	}
@@ -81,16 +81,16 @@ func TestDockerDaemon_RemoveUnusedImages(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			daemon := &DockerDaemon{
+			daemon := &Daemon{
 				client: tt.fields.client,
 			}
 			got, err := daemon.RemoveUnusedImages()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("DockerDaemon.RemoveUnusedImages() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Daemon.RemoveUnusedImages() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("DockerDaemon.RemoveUnusedImages() = %v, want %v", got, tt.want)
+				t.Errorf("Daemon.RemoveUnusedImages() = %v, want %v", got, tt.want)
 			}
 		})
 	}

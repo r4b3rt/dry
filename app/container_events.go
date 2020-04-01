@@ -33,12 +33,14 @@ func (h *containersScreenEventHandler) handle(event *tcell.EventKey, f func(even
 
 func (h *containersScreenEventHandler) handleCommand(command commandRunner, f func(eventHandler)) {
 	dry := h.dry
-	screen := h.screen
+	screen := h.dry.screen
 	id := command.container.ID
 
 	switch command.command {
+
 	case docker.KILL:
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to kill container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -73,6 +75,7 @@ func (h *containersScreenEventHandler) handleCommand(command commandRunner, f fu
 
 	case docker.RESTART:
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to restart container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -104,6 +107,7 @@ func (h *containersScreenEventHandler) handleCommand(command commandRunner, f fu
 
 	case docker.STOP:
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to stop container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -137,6 +141,7 @@ func (h *containersScreenEventHandler) handleCommand(command commandRunner, f fu
 		h.showLogs(id, false, f)
 	case docker.RM:
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to remove container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -193,7 +198,7 @@ func (h *containersScreenEventHandler) handleCommand(command commandRunner, f fu
 		forwarder := newEventForwarder()
 		f(forwarder)
 		err := inspect(
-			h.screen,
+			h.dry.screen,
 			forwarder.events(),
 			func(id string) (interface{}, error) {
 				return h.dry.dockerDaemon.Inspect(id)
@@ -243,8 +248,39 @@ func (h *containersScreenEventHandler) handleCharacter(key rune, f func(eventHan
 			}
 			f(h)
 		}
-		showFilterInput(newEventSource(forwarder.events()), applyFilter)
+		showFilterInput(dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 		refreshScreen()
+
+	case 'a', 'A': //attach
+
+		if err := h.widget.OnEvent(
+			func(id string) error {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+				dry.pause()
+				pos := dry.screen.Cursor().Position()
+				height, width := dry.screen.Dimensions().Height, dry.screen.Dimensions().Width
+				dry.screen.ClearAndFlush()
+				dry.screen.Sync()
+				dry.screen.Close()
+				execerr := dry.dockerDaemon.Exec(ctx, id, docker.ExecConfig{
+					Height: uint(height),
+					Width:  uint(width),
+					Cmd:    []string{"bash"},
+				})
+				dry.resume()
+				s, err := ui.NewScreen(appui.DryTheme)
+				// TODO Quit dry if a new screen could not be created.
+				if err != nil {
+					return err
+				}
+				s.HideCursor()
+				s.Cursor().ScrollTo(pos)
+				dry.sscreen(s)
+				return execerr
+			}); err != nil {
+			h.dry.message("Could not run command: " + err.Error())
+		}
 
 	case 'e', 'E': //remove
 		if err := h.widget.OnEvent(
@@ -317,7 +353,7 @@ func (h *containersScreenEventHandler) handleCharacter(key rune, f func(eventHan
 
 func (h *containersScreenEventHandler) handleKey(key tcell.Key, f func(eventHandler)) bool {
 	handled := true
-	cursor := h.screen.Cursor()
+	cursor := h.dry.screen.Cursor()
 	switch key {
 	case tcell.KeyF1: //sort
 		h.widget.Sort()
@@ -338,6 +374,7 @@ func (h *containersScreenEventHandler) handleKey(key tcell.Key, f func(eventHand
 		})
 	case tcell.KeyCtrlE: //remove all stopped
 		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
 			"All stopped containers will be removed. Do you want to continue? (y/N) ")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -430,10 +467,10 @@ func (h *containersScreenEventHandler) handleKey(key tcell.Key, f func(eventHand
 		}
 	case tcell.KeyEnter: //Container menu
 		showMenu := func(id string) error {
-			h.screen.Cursor().Reset()
+			h.dry.screen.Cursor().Reset()
 			widgets.ContainerMenu.ForContainer(id)
 			widgets.ContainerMenu.OnUnmount = func() error {
-				h.screen.Cursor().Reset()
+				h.dry.screen.Cursor().Reset()
 				h.dry.changeView(Main)
 				f(viewsToHandlers[Main])
 				return refreshScreen()
@@ -465,7 +502,7 @@ func statsScreen(container *docker.Container, stats *docker.StatsChannel, screen
 
 	info, infoLines := appui.NewContainerInfo(container)
 	screen.Render(1, info)
-	d := ui.ActiveScreen.Dimensions()
+	d := screen.Dimensions()
 
 	w, h := d.Width, d.Height
 	header := appui.NewMonitorTableHeader()
@@ -515,7 +552,7 @@ loop:
 }
 
 func (h *containersScreenEventHandler) showLogs(id string, withTimestamp bool, f func(eventHandler)) {
-	prompt := logsPrompt()
+	prompt := logsPrompt(h.dry.screen.Dimensions())
 	widgets.add(prompt)
 	forwarder := newEventForwarder()
 	f(forwarder)

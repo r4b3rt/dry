@@ -8,8 +8,10 @@ import (
 	"github.com/moncho/dry/ui"
 )
 
-func logsPrompt() *appui.Prompt {
-	return appui.NewPrompt("Show logs since timestamp (e.g. 2013-01-02T13:23:37) or relative (e.g. 42m for 42 minutes) or leave empty")
+func logsPrompt(bounds ui.Dimensions) *appui.Prompt {
+	return appui.NewPrompt(
+		bounds,
+		"Show logs since timestamp (e.g. 2013-01-02T13:23:37) or relative (e.g. 42m for 42 minutes) or leave empty")
 }
 
 func newEventSource(events <-chan *tcell.EventKey) ui.EventSource {

@@ -55,12 +55,13 @@ func (h *cMenuEventHandler) handle(event *tcell.EventKey, f func(eventHandler)) 
 func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f func(eventHandler)) {
 
 	dry := h.dry
-	screen := h.screen
+	screen := h.dry.screen
 
 	container := dry.dockerDaemon.ContainerByID(id)
 	switch command {
 	case docker.KILL:
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to kill container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -94,6 +95,7 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 	case docker.RESTART:
 
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to restart container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -128,6 +130,7 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 	case docker.STOP:
 
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to stop container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -161,7 +164,7 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 		}()
 	case docker.LOGS:
 
-		prompt := logsPrompt()
+		prompt := logsPrompt(h.dry.screen.Dimensions())
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -197,6 +200,7 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 		}()
 	case docker.RM:
 		prompt := appui.NewPrompt(
+			screen.Dimensions(),
 			fmt.Sprintf("Do you want to remove container %s? (y/N)", id))
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
@@ -252,7 +256,7 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 		refreshScreen()
 
 		err := inspect(
-			h.screen,
+			h.dry.screen,
 			forwarder.events(),
 			func(id string) (interface{}, error) {
 				return h.dry.dockerDaemon.Inspect(id)

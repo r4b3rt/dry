@@ -18,7 +18,7 @@ const (
 )
 
 //Node returns the node with the given id
-func (daemon *DockerDaemon) Node(id string) (*swarm.Node, error) {
+func (daemon *Daemon) Node(id string) (*swarm.Node, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
@@ -30,7 +30,7 @@ func (daemon *DockerDaemon) Node(id string) (*swarm.Node, error) {
 }
 
 //NodeChangeAvailability changes the availability of the given node
-func (daemon *DockerDaemon) NodeChangeAvailability(nodeID string, availability swarm.NodeAvailability) error {
+func (daemon *Daemon) NodeChangeAvailability(nodeID string, availability swarm.NodeAvailability) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	node, _, err := daemon.client.NodeInspectWithRaw(ctx, nodeID)
@@ -47,7 +47,7 @@ func (daemon *DockerDaemon) NodeChangeAvailability(nodeID string, availability s
 }
 
 //Nodes returns the nodes that are part of the Swarm
-func (daemon *DockerDaemon) Nodes() ([]swarm.Node, error) {
+func (daemon *Daemon) Nodes() ([]swarm.Node, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
@@ -59,7 +59,7 @@ func (daemon *DockerDaemon) Nodes() ([]swarm.Node, error) {
 }
 
 //NodeTasks returns the tasks being run by the given node
-func (daemon *DockerDaemon) NodeTasks(nodeID string) ([]swarm.Task, error) {
+func (daemon *Daemon) NodeTasks(nodeID string) ([]swarm.Task, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
@@ -75,22 +75,22 @@ func (daemon *DockerDaemon) NodeTasks(nodeID string) ([]swarm.Task, error) {
 }
 
 //ResolveNode will attempt to resolve the given node ID to a name.
-func (daemon *DockerDaemon) ResolveNode(id string) (string, error) {
+func (daemon *Daemon) ResolveNode(id string) (string, error) {
 	return daemon.resolve(swarm.Node{}, id)
 }
 
 //ResolveService will attempt to resolve the given service ID to a name.
-func (daemon *DockerDaemon) ResolveService(id string) (string, error) {
+func (daemon *Daemon) ResolveService(id string) (string, error) {
 	return daemon.resolve(swarm.Service{}, id)
 }
-func (daemon *DockerDaemon) resolve(t interface{}, id string) (string, error) {
+func (daemon *Daemon) resolve(t interface{}, id string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	return daemon.resolver.Resolve(ctx, t, id)
 }
 
 //Service returns service details of the service with the given id
-func (daemon *DockerDaemon) Service(id string) (*swarm.Service, error) {
+func (daemon *Daemon) Service(id string) (*swarm.Service, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	service, _, err := daemon.client.ServiceInspectWithRaw(ctx, id, types.ServiceInspectOptions{InsertDefaults: true})
@@ -102,7 +102,7 @@ func (daemon *DockerDaemon) Service(id string) (*swarm.Service, error) {
 }
 
 //ServiceLogs returns logs of the service with the given id
-func (daemon *DockerDaemon) ServiceLogs(id string, since string, withTimestamps bool) (io.ReadCloser, error) {
+func (daemon *Daemon) ServiceLogs(id string, since string, withTimestamps bool) (io.ReadCloser, error) {
 
 	options := types.ContainerLogsOptions{
 		ShowStdout: true,
@@ -116,21 +116,21 @@ func (daemon *DockerDaemon) ServiceLogs(id string, since string, withTimestamps 
 }
 
 //Services returns the services known by the Swarm
-func (daemon *DockerDaemon) Services() ([]swarm.Service, error) {
+func (daemon *Daemon) Services() ([]swarm.Service, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	return daemon.client.ServiceList(ctx, types.ServiceListOptions{})
 }
 
 //ServiceRemove removes the service with the given in
-func (daemon *DockerDaemon) ServiceRemove(id string) error {
+func (daemon *Daemon) ServiceRemove(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	return daemon.client.ServiceRemove(ctx, id)
 }
 
 //ServiceScale scales the given service by the given number of replicas
-func (daemon *DockerDaemon) ServiceScale(id string, replicas uint64) error {
+func (daemon *Daemon) ServiceScale(id string, replicas uint64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 
@@ -157,7 +157,7 @@ func (daemon *DockerDaemon) ServiceScale(id string, replicas uint64) error {
 }
 
 //ServiceUpdate forces an update of the given service
-func (daemon *DockerDaemon) ServiceUpdate(id string) error {
+func (daemon *Daemon) ServiceUpdate(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 
@@ -179,7 +179,7 @@ func (daemon *DockerDaemon) ServiceUpdate(id string) error {
 }
 
 //ServiceTasks returns the tasks being run that belong to the given list of services
-func (daemon *DockerDaemon) ServiceTasks(services ...string) ([]swarm.Task, error) {
+func (daemon *Daemon) ServiceTasks(services ...string) ([]swarm.Task, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
@@ -197,7 +197,7 @@ func (daemon *DockerDaemon) ServiceTasks(services ...string) ([]swarm.Task, erro
 }
 
 //Stacks returns the stack list
-func (daemon *DockerDaemon) Stacks() ([]Stack, error) {
+func (daemon *Daemon) Stacks() ([]Stack, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 
@@ -255,7 +255,7 @@ func (daemon *DockerDaemon) Stacks() ([]Stack, error) {
 }
 
 //StackConfigs returns the configs created for the given stack
-func (daemon *DockerDaemon) StackConfigs(stack string) ([]swarm.Config, error) {
+func (daemon *Daemon) StackConfigs(stack string) ([]swarm.Config, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	return daemon.client.ConfigList(
@@ -264,7 +264,7 @@ func (daemon *DockerDaemon) StackConfigs(stack string) ([]swarm.Config, error) {
 }
 
 //StackNetworks returns the networks created for the given stack
-func (daemon *DockerDaemon) StackNetworks(stack string) ([]types.NetworkResource, error) {
+func (daemon *Daemon) StackNetworks(stack string) ([]types.NetworkResource, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	return daemon.client.NetworkList(
@@ -273,7 +273,7 @@ func (daemon *DockerDaemon) StackNetworks(stack string) ([]types.NetworkResource
 }
 
 //StackSecrets return the secrets created for the given stack
-func (daemon *DockerDaemon) StackSecrets(stack string) ([]swarm.Secret, error) {
+func (daemon *Daemon) StackSecrets(stack string) ([]swarm.Secret, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	return daemon.client.SecretList(
@@ -282,7 +282,7 @@ func (daemon *DockerDaemon) StackSecrets(stack string) ([]swarm.Secret, error) {
 }
 
 //StackServices returns the given stack service list
-func (daemon *DockerDaemon) StackServices(stack string) ([]swarm.Service, error) {
+func (daemon *Daemon) StackServices(stack string) ([]swarm.Service, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	filter := buildStackFilter(stack)
@@ -296,7 +296,7 @@ func (daemon *DockerDaemon) StackServices(stack string) ([]swarm.Service, error)
 }
 
 //StackTasks returns the given stack task list
-func (daemon *DockerDaemon) StackTasks(stack string) ([]swarm.Task, error) {
+func (daemon *Daemon) StackTasks(stack string) ([]swarm.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 	filter := buildStackFilter(stack)
@@ -310,7 +310,7 @@ func (daemon *DockerDaemon) StackTasks(stack string) ([]swarm.Task, error) {
 }
 
 //Task returns the task with the given id
-func (daemon *DockerDaemon) Task(id string) (swarm.Task, error) {
+func (daemon *Daemon) Task(id string) (swarm.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 

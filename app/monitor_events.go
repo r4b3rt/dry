@@ -17,7 +17,7 @@ type monitorScreenEventHandler struct {
 
 func (h *monitorScreenEventHandler) handle(event *tcell.EventKey, f func(eventHandler)) {
 	handled := false
-	cursor := h.screen.Cursor()
+	cursor := h.dry.screen.Cursor()
 	switch event.Key() {
 	case tcell.KeyF1:
 		handled = true
@@ -34,10 +34,10 @@ func (h *monitorScreenEventHandler) handle(event *tcell.EventKey, f func(eventHa
 	case tcell.KeyEnter: //Container menu
 		showMenu := func(id string) error {
 			h.widget.Unmount()
-			h.screen.Cursor().Reset()
+			h.dry.screen.Cursor().Reset()
 			widgets.ContainerMenu.ForContainer(id)
 			widgets.ContainerMenu.OnUnmount = func() error {
-				h.screen.Cursor().Reset()
+				h.dry.screen.Cursor().Reset()
 				h.dry.changeView(Monitor)
 				f(h)
 				return refreshScreen()
@@ -64,7 +64,9 @@ func (h *monitorScreenEventHandler) handle(event *tcell.EventKey, f func(eventHa
 		case 's': // Set the delay between updates to <delay> seconds.
 			//widget is mounted on render, dont Mount here
 			h.widget.Unmount()
-			prompt := appui.NewPrompt("Set the delay between updates (in milliseconds)")
+			prompt := appui.NewPrompt(
+				h.dry.screen.Dimensions(),
+				"Set the delay between updates (in milliseconds)")
 			widgets.add(prompt)
 			forwarder := newEventForwarder()
 			f(forwarder)

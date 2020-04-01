@@ -8,7 +8,7 @@ import (
 )
 
 func TestImageRun(t *testing.T) {
-	daemon := DockerDaemon{client: mock.ImageAPIClientMock{}}
+	daemon := Daemon{client: mock.ImageAPIClientMock{}}
 	err := daemon.RunImage(types.ImageSummary{
 		RepoTags: []string{"nope:latest"},
 	}, "command")

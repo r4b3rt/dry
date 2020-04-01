@@ -3,9 +3,9 @@ package app
 import (
 	"fmt"
 
+	"github.com/gdamore/tcell"
 	"github.com/moncho/dry/appui"
 	"github.com/moncho/dry/ui"
-	"github.com/gdamore/tcell"
 )
 
 const (
@@ -28,7 +28,9 @@ func (h *diskUsageScreenEventHandler) handle(event *tcell.EventKey, f func(event
 	case 'p', 'P':
 		handled = true
 
-		rw := appui.NewPrompt(confirmation)
+		rw := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			confirmation)
 		widgets.add(rw)
 		forwarder := newEventForwarder()
 		f(forwarder)

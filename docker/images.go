@@ -10,7 +10,7 @@ import (
 )
 
 //History returns image history
-func (daemon *DockerDaemon) History(id string) ([]image.HistoryResponseItem, error) {
+func (daemon *Daemon) History(id string) ([]image.HistoryResponseItem, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
@@ -20,7 +20,7 @@ func (daemon *DockerDaemon) History(id string) ([]image.HistoryResponseItem, err
 }
 
 //ImageByID returns the image with the given ID
-func (daemon *DockerDaemon) ImageByID(id string) (dockerTypes.ImageSummary, error) {
+func (daemon *Daemon) ImageByID(id string) (dockerTypes.ImageSummary, error) {
 	var result dockerTypes.ImageSummary
 	images, err := daemon.Images()
 	if err != nil {
@@ -37,7 +37,7 @@ func (daemon *DockerDaemon) ImageByID(id string) (dockerTypes.ImageSummary, erro
 }
 
 //Images returns the list of Docker images
-func (daemon *DockerDaemon) Images() ([]dockerTypes.ImageSummary, error) {
+func (daemon *Daemon) Images() ([]dockerTypes.ImageSummary, error) {
 
 	return images(daemon.client, defaultImageListOptions)
 
@@ -45,7 +45,7 @@ func (daemon *DockerDaemon) Images() ([]dockerTypes.ImageSummary, error) {
 
 //RunImage creates a container based on the given image and runs the given command
 //Kind of like running "docker run $image $command" from the command line.
-func (daemon *DockerDaemon) RunImage(image dockerTypes.ImageSummary, command string) error {
+func (daemon *Daemon) RunImage(image dockerTypes.ImageSummary, command string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 

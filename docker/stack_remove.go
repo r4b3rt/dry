@@ -14,7 +14,7 @@ import (
 )
 
 //StackRemove removes the stack with the given in
-func (daemon *DockerDaemon) StackRemove(stack string) error {
+func (daemon *Daemon) StackRemove(stack string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultOperationTimeout)
 	defer cancel()
 
@@ -72,7 +72,7 @@ func sortServiceByName(services []swarm.Service) func(i, j int) bool {
 
 func removeServices(
 	ctx context.Context,
-	daemon *DockerDaemon,
+	daemon *Daemon,
 	services []swarm.Service) bool {
 	var hasError bool
 	sort.Slice(services, sortServiceByName(services))
@@ -86,7 +86,7 @@ func removeServices(
 
 func removeNetworks(
 	ctx context.Context,
-	daemon *DockerDaemon,
+	daemon *Daemon,
 	networks []types.NetworkResource) bool {
 	var hasError bool
 	for _, network := range networks {
@@ -99,7 +99,7 @@ func removeNetworks(
 
 func removeSecrets(
 	ctx context.Context,
-	daemon *DockerDaemon,
+	daemon *Daemon,
 	secrets []swarm.Secret) bool {
 	var hasError bool
 	for _, secret := range secrets {
@@ -112,7 +112,7 @@ func removeSecrets(
 
 func removeConfigs(
 	ctx context.Context,
-	daemon *DockerDaemon,
+	daemon *Daemon,
 	configs []swarm.Config) bool {
 	var hasError bool
 	for _, config := range configs {

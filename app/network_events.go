@@ -16,7 +16,7 @@ type networksScreenEventHandler struct {
 
 func (h *networksScreenEventHandler) handle(event *tcell.EventKey, f func(eh eventHandler)) {
 	dry := h.dry
-	screen := h.screen
+	screen := h.dry.screen
 	handled := true
 	switch event.Key() {
 	case tcell.KeyF1: //sort
@@ -46,7 +46,9 @@ func (h *networksScreenEventHandler) handle(event *tcell.EventKey, f func(eh eve
 
 	case tcell.KeyCtrlE: //remove network
 
-		prompt := appui.NewPrompt("Do you want to remove the selected network? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove the selected network? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -103,7 +105,7 @@ func (h *networksScreenEventHandler) handle(event *tcell.EventKey, f func(eh eve
 				}
 				f(h)
 			}
-			showFilterInput(newEventSource(forwarder.events()), applyFilter)
+			showFilterInput(dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 		}
 	}
 	if !handled {

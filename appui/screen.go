@@ -17,6 +17,6 @@ type Screen interface {
 // ScreenBuffererRender is a rendering device for termui Bufferers.
 type ScreenBuffererRender interface {
 	Screen
-	Flush() *ui.Screen
+	Flush()
 	RenderBufferer(bs ...termui.Bufferer)
 }

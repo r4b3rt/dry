@@ -7,8 +7,10 @@ import (
 	"github.com/moncho/dry/ui"
 )
 
-func showFilterInput(es ui.EventSource, onDone func(string, bool)) {
-	rw := appui.NewPrompt("Filter? (blank to remove current filter)")
+func showFilterInput(bounds ui.Dimensions, es ui.EventSource, onDone func(string, bool)) {
+	rw := appui.NewPrompt(
+		bounds,
+		"Filter? (blank to remove current filter)")
 	widgets.add(rw)
 	go func() {
 		err := rw.OnFocus(es)

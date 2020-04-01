@@ -26,6 +26,7 @@ type ContainerDaemon interface {
 	VolumesAPI
 	SwarmAPI
 	ContainerRuntime
+	Close()
 	DiskUsage() (types.DiskUsage, error)
 	DockerEnv() Env
 	Events() (<-chan events.Message, chan<- struct{}, error)
@@ -43,14 +44,15 @@ type ContainerDaemon interface {
 //ContainerAPI is a subset of the Docker API to manage containers
 type ContainerAPI interface {
 	ContainerByID(id string) *Container
-	Containers(filter []ContainerFilter, mode SortMode) []*Container
+	Containers([]ContainerFilter, SortMode) []*Container
+	Exec(context.Context, string, ExecConfig) error
 	Inspect(id string) (types.ContainerJSON, error)
 	IsContainerRunning(id string) bool
 	Kill(id string) error
 	Logs(id string, since string, withTimeStamp bool) (io.ReadCloser, error)
 	RemoveAllStoppedContainers() (int, error)
-	RestartContainer(id string) error
-	StopContainer(id string) error
+	RestartContainer(string) error
+	StopContainer(string) error
 }
 
 //ContainerRuntime is the subset of the Docker API to query container runtime information

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types/events"
+	gtermui "github.com/gizak/termui"
 	"github.com/moncho/dry/appui"
 	"github.com/moncho/dry/appui/swarm"
 	docker "github.com/moncho/dry/docker"
@@ -22,11 +23,12 @@ type Dry struct {
 	dockerEvents     <-chan events.Message
 	dockerEventsDone chan<- struct{}
 	output           chan string
-	screen           *ui.Screen
 	showHeader       bool
 
 	sync.RWMutex
-	view viewMode
+	view   viewMode
+	paused bool
+	screen *ui.Screen
 }
 
 func (d *Dry) showingHeader() bool {
@@ -39,6 +41,8 @@ func (d *Dry) toggleShowHeader() {
 
 //Close closes dry, releasing any resources held by it
 func (d *Dry) Close() {
+	d.dockerDaemon.Close()
+	d.screen.Close()
 	close(d.dockerEventsDone)
 	close(d.output)
 }
@@ -46,11 +50,6 @@ func (d *Dry) Close() {
 //OuputChannel returns the channel where dry messages are written
 func (d *Dry) OuputChannel() <-chan string {
 	return d.output
-}
-
-//Ok returns the state of dry
-func (d *Dry) Ok() (bool, error) {
-	return d.dockerDaemon.Ok()
 }
 
 //changeView changes the active view mode
@@ -101,18 +100,45 @@ func (d *Dry) viewMode() viewMode {
 	return d.view
 }
 
+func (d *Dry) isPaused() bool {
+	d.RLock()
+	defer d.RUnlock()
+	return d.paused
+}
+
+func (d *Dry) pause() {
+	d.Lock()
+	defer d.Unlock()
+	d.paused = true
+}
+func (d *Dry) resume() {
+	d.Lock()
+	defer d.Unlock()
+	d.paused = false
+}
+
+func (d *Dry) gscreen() *ui.Screen {
+	d.RLock()
+	defer d.RUnlock()
+	return d.screen
+}
+
+func (d *Dry) sscreen(s *ui.Screen) {
+	d.Lock()
+	defer d.Unlock()
+	d.screen = s
+}
+
 //initRegistry creates a widget registry with its widget ready to be used
 func initRegistry(dry *Dry) *widgetRegistry {
 	daemon := dry.dockerDaemon
-	mainScreen := dry.screen
-
-	d := mainScreen.Dimensions()
+	d := dry.screen.Dimensions()
 	height, width := d.Height, d.Width
 	di := appui.NewDockerInfo(daemon)
 	di.SetX(0)
 	di.SetY(1)
 	di.SetWidth(width)
-	widgetScreen := &screen{mainScreen, dry}
+	widgetScreen := &screen{dry}
 	w := widgetRegistry{
 		DockerInfo:    di,
 		ContainerList: appui.NewContainersWidget(daemon, widgetScreen),
@@ -128,7 +154,7 @@ func initRegistry(dry *Dry) *widgetRegistry {
 		Stacks:        swarm.NewStacksWidget(daemon, widgetScreen),
 		StackTasks:    swarm.NewStacksTasksWidget(daemon, widgetScreen),
 		widgets:       make(map[string]termui.Widget),
-		MessageBar:    ui.NewExpiringMessageWidget(0, mainScreen),
+		MessageBar:    ui.NewExpiringMessageWidget(0, dry.screen.RenderAtColumn),
 		Volumes:       appui.NewVolumesWidget(daemon, widgetScreen),
 	}
 
@@ -143,7 +169,7 @@ func initRegistry(dry *Dry) *widgetRegistry {
 	return &w
 }
 
-func newDry(screen *ui.Screen, d *docker.DockerDaemon) (*Dry, error) {
+func newDry(screen *ui.Screen, d docker.ContainerDaemon) (*Dry, error) {
 	dockerEvents, dockerEventsDone, err := d.Events()
 	if err != nil {
 		return nil, err
@@ -227,14 +253,13 @@ func refreshOnContainerEvent(w termui.Widget, daemon docker.ContainerDaemon) {
 		})
 }
 
-// available screen for widgets
+// screen for widgets.
 type screen struct {
-	*ui.Screen
 	dry *Dry
 }
 
 func (s *screen) Bounds() image.Rectangle {
-	dim := s.Screen.Dimensions()
+	dim := s.dry.gscreen().Dimensions()
 	y := 0
 	if s.dry.showingHeader() {
 		y = appui.MainScreenHeaderSize
@@ -244,5 +269,13 @@ func (s *screen) Bounds() image.Rectangle {
 }
 
 func (s *screen) Cursor() *ui.Cursor {
-	return s.Screen.Cursor()
+	return s.dry.gscreen().Cursor()
+}
+
+func (s *screen) Flush() {
+	s.dry.gscreen().Flush()
+}
+
+func (s *screen) RenderBufferer(bs ...gtermui.Bufferer) {
+	s.dry.gscreen().RenderBufferer(bs...)
 }

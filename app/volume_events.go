@@ -16,7 +16,7 @@ type volumesScreenEventHandler struct {
 
 func (h *volumesScreenEventHandler) handle(event *tcell.EventKey, f func(eh eventHandler)) {
 	dry := h.dry
-	screen := h.screen
+	screen := h.dry.screen
 	handled := true
 	switch event.Key() {
 	case tcell.KeyF1: //sort
@@ -45,7 +45,9 @@ func (h *volumesScreenEventHandler) handle(event *tcell.EventKey, f func(eh even
 		}
 	case tcell.KeyCtrlA: //remove all
 
-		prompt := appui.NewPrompt("Do you want to remove all volumes? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove all volumes? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -79,7 +81,9 @@ func (h *volumesScreenEventHandler) handle(event *tcell.EventKey, f func(eh even
 
 	case tcell.KeyCtrlE: //remove volume
 
-		prompt := appui.NewPrompt("Do you want to remove the selected volume? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove the selected volume? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -118,7 +122,9 @@ func (h *volumesScreenEventHandler) handle(event *tcell.EventKey, f func(eh even
 		}()
 	case tcell.KeyCtrlF: //force volume removal
 
-		prompt := appui.NewPrompt("Do you want to remove the selected volume? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove the selected volume? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -156,7 +162,9 @@ func (h *volumesScreenEventHandler) handle(event *tcell.EventKey, f func(eh even
 
 		}()
 	case tcell.KeyCtrlU: //remove unused volumes
-		prompt := appui.NewPrompt("Do you want to remove unused volumes? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove unused volumes? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -206,7 +214,7 @@ func (h *volumesScreenEventHandler) handle(event *tcell.EventKey, f func(eh even
 				}
 				f(h)
 			}
-			showFilterInput(newEventSource(forwarder.events()), applyFilter)
+			showFilterInput(dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 		}
 	}
 	if !handled {

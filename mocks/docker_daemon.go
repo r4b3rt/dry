@@ -14,16 +14,20 @@ import (
 	drydocker "github.com/moncho/dry/docker"
 )
 
-//DockerDaemonMock mocks a DockerDaemon
+// DockerDaemonMock mocks a DockerDaemon.
 type DockerDaemonMock struct {
 }
 
-//ContainerByID mock
+// Close mock.
+func (_m *DockerDaemonMock) Close() {
+}
+
+// ContainerByID mock.
 func (_m *DockerDaemonMock) ContainerByID(id string) *drydocker.Container {
 	return nil
 }
 
-//Containers mock
+// Containers mock.
 func (_m *DockerDaemonMock) Containers(filters []drydocker.ContainerFilter, mode drydocker.SortMode) []*drydocker.Container {
 
 	var containers []*drydocker.Container
@@ -45,28 +49,28 @@ func (_m *DockerDaemonMock) Containers(filters []drydocker.ContainerFilter, mode
 	return containers
 }
 
-//DiskUsage mock
+// DiskUsage mock.
 func (_m *DockerDaemonMock) DiskUsage() (types.DiskUsage, error) {
 	return types.DiskUsage{}, nil
 }
 
-// DockerEnv provides a mock function with given fields:
+// DockerEnv mock.
 func (_m *DockerDaemonMock) DockerEnv() drydocker.Env {
 	return drydocker.Env{DockerHost: "dry.io", DockerTLSVerify: false, DockerCertPath: ""}
 }
 
-// Events provides a mock function with given fields:
+// Events mock.
 func (_m *DockerDaemonMock) Events() (<-chan events.Message, chan<- struct{}, error) {
 
 	return nil, nil, nil
 }
 
-//EventLog mock
+// EventLog mock.
 func (_m *DockerDaemonMock) EventLog() *drydocker.EventLog {
 	return nil
 }
 
-//History mock
+// History mock.
 func (_m *DockerDaemonMock) History(id string) ([]image.HistoryResponseItem, error) {
 	return nil, nil
 }
@@ -76,7 +80,7 @@ func (_m *DockerDaemonMock) ImageByID(id string) (types.ImageSummary, error) {
 	return types.ImageSummary{}, nil
 }
 
-//Images mock
+// Images mock.
 func (_m *DockerDaemonMock) Images() ([]types.ImageSummary, error) {
 
 	imagesJSON := `[
@@ -131,13 +135,13 @@ func (_m *DockerDaemonMock) Images() ([]types.ImageSummary, error) {
 	return images, err
 }
 
-//ImagesCount mock
+// ImagesCount mock.
 func (_m *DockerDaemonMock) ImagesCount() int {
 	i, _ := _m.Images()
 	return len(i)
 }
 
-// Info provides a mock function with given fields:
+// Info mock.
 func (_m *DockerDaemonMock) Info() (types.Info, error) {
 	swarmInfo := swarm.Info{LocalNodeState: swarm.LocalNodeStateInactive}
 	return types.Info{
@@ -147,155 +151,155 @@ func (_m *DockerDaemonMock) Info() (types.Info, error) {
 		Swarm:    swarmInfo}, nil
 }
 
-// Inspect provides a mock function with given fields: id
+// Inspect mock.
 func (_m *DockerDaemonMock) Inspect(id string) (types.ContainerJSON, error) {
 	return types.ContainerJSON{}, nil
 }
 
-// InspectImage mock
+// InspectImage mock.
 func (_m *DockerDaemonMock) InspectImage(name string) (types.ImageInspect, error) {
 	return types.ImageInspect{}, nil
 }
 
-// IsContainerRunning provides a mock function with given fields: id
+// IsContainerRunning mock.
 func (_m *DockerDaemonMock) IsContainerRunning(id string) bool {
 	return false
 }
 
-// Kill provides a mock function with given fields: id
+// Kill mock.
 func (_m *DockerDaemonMock) Kill(id string) error {
 	return nil
 }
 
-// Logs provides a mock function with given fields: id
+// Logs mock.
 func (_m *DockerDaemonMock) Logs(id, since string, ts bool) (io.ReadCloser, error) {
 	return nil, nil
 }
 
-//Networks mock
+// Networks mock.
 func (_m *DockerDaemonMock) Networks() ([]types.NetworkResource, error) {
 	return nil, nil
 }
 
-//NetworkAt mock
+// NetworkAt mock.
 func (_m *DockerDaemonMock) NetworkAt(position int) (*types.NetworkResource, error) {
 	return nil, nil
 }
 
-//NetworksCount mock
+// NetworksCount mock.
 func (_m *DockerDaemonMock) NetworksCount() int {
 	return 0
 }
 
-//NetworkInspect mock
+// NetworkInspect mock.
 func (_m *DockerDaemonMock) NetworkInspect(id string) (types.NetworkResource, error) {
 	return types.NetworkResource{}, nil
 }
 
-//Node mock
+// Node mock.
 func (_m *DockerDaemonMock) Node(id string) (*swarm.Node, error) {
 	return nil, nil
 }
 
-//NodeChangeAvailability mock
+// NodeChangeAvailability mock.
 func (_m *DockerDaemonMock) NodeChangeAvailability(nodeID string, availability swarm.NodeAvailability) error {
 	return nil
 }
 
-//Nodes mock
+// Nodes mock.
 func (_m *DockerDaemonMock) Nodes() ([]swarm.Node, error) {
 	return nil, nil
 }
 
-//NodeTasks mock
+//NodeTasks mock.
 func (_m *DockerDaemonMock) NodeTasks(nodeID string) ([]swarm.Task, error) {
 	return nil, nil
 }
 
-// Ok mocks OK
+// Ok mock.
 func (_m *DockerDaemonMock) Ok() (bool, error) {
 
 	return false, nil
 }
 
-//StatsChannel mocks StatsChannel
+// StatsChannel mock.
 func (_m *DockerDaemonMock) StatsChannel(container *drydocker.Container) (*drydocker.StatsChannel, error) {
 	return nil, nil
 }
 
-// Prune mocks prune command
+// Prune mocks prune command.
 func (_m *DockerDaemonMock) Prune() (*drydocker.PruneReport, error) {
 	return nil, nil
 }
 
-// RestartContainer provides a mock function with given fields: id
+// RestartContainer mock.
 func (_m *DockerDaemonMock) RestartContainer(id string) error {
 
 	return nil
 }
 
-// Rm provides a mock function with given fields: id
+// Rm mock.
 func (_m *DockerDaemonMock) Rm(id string) error {
 	return nil
 }
 
-// Rmi mock
+// Rmi mock.
 func (_m *DockerDaemonMock) Rmi(id string, force bool) ([]types.ImageDeleteResponseItem, error) {
 	return nil, nil
 }
 
-// Refresh provides a mock function with given fields: allContainers
+// Refresh mock.
 func (_m *DockerDaemonMock) Refresh(notify func(err error)) {
 	notify(nil)
 }
 
-//RefreshImages mock
+// RefreshImages mock.
 func (_m *DockerDaemonMock) RefreshImages() error {
 	return nil
 }
 
-//RefreshNetworks mock
+// RefreshNetworks mock.
 func (_m *DockerDaemonMock) RefreshNetworks() error {
 	return nil
 }
 
-// RemoveAllStoppedContainers provides a mock function with given fields:
+// RemoveAllStoppedContainers mock.
 func (_m *DockerDaemonMock) RemoveAllStoppedContainers() (int, error) {
 	return 0, nil
 
 }
 
-//RemoveDanglingImages mock
+// RemoveDanglingImages mock.
 func (_m *DockerDaemonMock) RemoveDanglingImages() (int, error) {
 	return 0, nil
 }
 
-//RemoveNetwork mock
+// RemoveNetwork mock.
 func (_m *DockerDaemonMock) RemoveNetwork(id string) error {
 	return nil
 }
 
-//RemoveUnusedImages mock
+// RemoveUnusedImages mock.
 func (_m *DockerDaemonMock) RemoveUnusedImages() (int, error) {
 	return 0, nil
 }
 
-//ResolveNode mock
+// ResolveNode mock
 func (_m *DockerDaemonMock) ResolveNode(id string) (string, error) {
 	return "", nil
 }
 
-//ResolveService mock
+// ResolveService mock.
 func (_m *DockerDaemonMock) ResolveService(id string) (string, error) {
 	return "", nil
 }
 
-//RunImage mock
+// RunImage mock.
 func (_m *DockerDaemonMock) RunImage(image types.ImageSummary, command string) error {
 	return nil
 }
 
-//Service mock
+// Service mock.
 func (_m *DockerDaemonMock) Service(id string) (*swarm.Service, error) {
 	return nil, nil
 }
@@ -305,96 +309,96 @@ func (_m *DockerDaemonMock) ServiceLogs(id, since string, ts bool) (io.ReadClose
 	return nil, nil
 }
 
-//Services mock
+// Services mock.
 func (_m *DockerDaemonMock) Services() ([]swarm.Service, error) {
 	return nil, nil
 }
 
-//ServiceRemove mock
+// ServiceRemove mock.
 func (_m *DockerDaemonMock) ServiceRemove(id string) error {
 	return nil
 }
 
-//ServiceScale mock
+// ServiceScale mock.
 func (_m *DockerDaemonMock) ServiceScale(id string, scale uint64) error {
 	return nil
 }
 
-//ServiceTasks mock
+// ServiceTasks mock.
 func (_m *DockerDaemonMock) ServiceTasks(services ...string) ([]swarm.Task, error) {
 	return nil, nil
 }
 
-//ServiceUpdate forces an update of the given service
+// ServiceUpdate forces an update of the given service.
 func (_m *DockerDaemonMock) ServiceUpdate(id string) error {
 	return nil
 }
 
-// StopContainer provides a mock function with given fields: id
+// StopContainer mock.
 func (_m *DockerDaemonMock) StopContainer(id string) error {
 	return nil
 }
 
-// Sort provides a mock function with given fields: sortMode
+// Sort mock.
 func (_m *DockerDaemonMock) Sort(sortMode drydocker.SortMode) {
 
 }
 
-//SortImages mock
+// SortImages mock.
 func (_m *DockerDaemonMock) SortImages(sortMode drydocker.SortMode) {
 }
 
-//SortNetworks mock
+// SortNetworks mock.
 func (_m *DockerDaemonMock) SortNetworks(sortMode drydocker.SortMode) {
 }
 
-//Stacks mock
+// Stacks mock.
 func (_m *DockerDaemonMock) Stacks() ([]drydocker.Stack, error) {
 	return nil, nil
 }
 
-//StackConfigs mock
+// StackConfigs mock.
 func (_m *DockerDaemonMock) StackConfigs(stack string) ([]swarm.Config, error) {
 	return nil, nil
 }
 
-//StackNetworks mock
+// StackNetworks mock.
 func (_m *DockerDaemonMock) StackNetworks(stack string) ([]types.NetworkResource, error) {
 	return nil, nil
 }
 
-//StackSecrets mock
+// StackSecrets mock.
 func (_m *DockerDaemonMock) StackSecrets(stack string) ([]swarm.Secret, error) {
 	return nil, nil
 }
 
-//StackRemove mock
+// StackRemove mock.
 func (_m *DockerDaemonMock) StackRemove(stack string) error {
 	return nil
 }
 
-//StackServices mock
+// StackServices mock.
 func (_m *DockerDaemonMock) StackServices(stack string) ([]swarm.Service, error) {
 	return nil, nil
 }
 
-//StackTasks empty mock
+// StackTasks empty mock.
 func (_m *DockerDaemonMock) StackTasks(stack string) ([]swarm.Task, error) {
 	return nil, nil
 }
 
-//Task empty mock
+// Task empty mock.
 func (_m *DockerDaemonMock) Task(id string) (swarm.Task, error) {
 	return swarm.Task{}, nil
 }
 
-//Top function mock
-func (_m *DockerDaemonMock) Top(ctx context.Context, id string) (container.ContainerTopOKBody, error) {
+// Top function mock.
+func (_m *DockerDaemonMock) Top(ctx context.Context, s string) (container.ContainerTopOKBody, error) {
 
 	return container.ContainerTopOKBody{}, nil
 }
 
-// Version provides a mock function with given fields:
+// Version mock.
 func (_m *DockerDaemonMock) Version() (*types.Version, error) {
 	return &types.Version{
 		Version:       "1.0",
@@ -405,27 +409,27 @@ func (_m *DockerDaemonMock) Version() (*types.Version, error) {
 	}, nil
 }
 
-// VolumeInspect mock
+// VolumeInspect mock.
 func (_m *DockerDaemonMock) VolumeInspect(ctx context.Context, volumeID string) (types.Volume, error) {
 	return types.Volume{}, nil
 }
 
-// VolumeList mock
+// VolumeList mock.
 func (_m *DockerDaemonMock) VolumeList(ctx context.Context) ([]*types.Volume, error) {
 	return nil, nil
 }
 
-// VolumePrune mock
+// VolumePrune mock.
 func (_m *DockerDaemonMock) VolumePrune(ctx context.Context) (int, error) {
 	return 0, nil
 }
 
-// VolumeRemove mock
+// VolumeRemove mock.
 func (_m *DockerDaemonMock) VolumeRemove(ctx context.Context, volumeID string, force bool) error {
 	return nil
 }
 
-// VolumeRemoveAll mock
+// VolumeRemoveAll mock.
 func (_m *DockerDaemonMock) VolumeRemoveAll(ctx context.Context) (int, error) {
 	return 0, nil
 }

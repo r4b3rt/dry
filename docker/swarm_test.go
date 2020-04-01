@@ -13,7 +13,7 @@ import (
 )
 
 func TestSwarmNodeRetrieval(t *testing.T) {
-	daemon := DockerDaemon{client: mock.SwarmAPIClientMock{}}
+	daemon := Daemon{client: mock.SwarmAPIClientMock{}}
 	nodes, err := daemon.Nodes()
 
 	if err != nil {
@@ -25,7 +25,7 @@ func TestSwarmNodeRetrieval(t *testing.T) {
 }
 
 func TestTaskRetrieval(t *testing.T) {
-	daemon := DockerDaemon{client: mock.SwarmAPIClientMock{}}
+	daemon := Daemon{client: mock.SwarmAPIClientMock{}}
 	tasks, err := daemon.NodeTasks("1")
 
 	if err != nil {
@@ -47,7 +47,7 @@ func TestTaskRetrieval(t *testing.T) {
 
 func TestIDResolution(t *testing.T) {
 	r := &resolverMock{}
-	daemon := DockerDaemon{resolver: r}
+	daemon := Daemon{resolver: r}
 	name, err := daemon.ResolveNode("1")
 
 	if err != nil {
@@ -73,7 +73,7 @@ func (r *resolverMock) Resolve(ctx context.Context, t interface{}, id string) (s
 	}
 }
 
-func TestDockerDaemon_Stacks(t *testing.T) {
+func TestDaemon_Stacks(t *testing.T) {
 	type fields struct {
 		client    dockerAPI.APIClient
 		swarmMode bool
@@ -115,7 +115,7 @@ func TestDockerDaemon_Stacks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			daemon := &DockerDaemon{
+			daemon := &Daemon{
 				client:    tt.fields.client,
 				swarmMode: tt.fields.swarmMode,
 				resolver:  tt.fields.resolver,
@@ -123,11 +123,11 @@ func TestDockerDaemon_Stacks(t *testing.T) {
 			got, err := daemon.Stacks()
 			sort.SliceStable(stacksByName{got}.swarmStacks, stacksByName{got}.Less)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("DockerDaemon.Stacks() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Daemon.Stacks() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DockerDaemon.Stacks() = %v, want %v", got, tt.want)
+				t.Errorf("Daemon.Stacks() = %v, want %v", got, tt.want)
 			}
 		})
 	}

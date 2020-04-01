@@ -28,7 +28,9 @@ func (h *nodesScreenEventHandler) handle(event *tcell.EventKey, f func(eventHand
 		handled = true
 	case tcell.KeyCtrlA:
 		dry := h.dry
-		rw := appui.NewPrompt("Changing node availability, please type one of ('active'|'pause'|'drain')")
+		rw := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Changing node availability, please type one of ('active'|'pause'|'drain')")
 		forwarder := newEventForwarder()
 		f(forwarder)
 		refreshScreen()
@@ -71,7 +73,7 @@ func (h *nodesScreenEventHandler) handle(event *tcell.EventKey, f func(eventHand
 
 	case tcell.KeyEnter:
 		showServices := func(nodeID string) error {
-			h.screen.Cursor().Reset()
+			h.dry.screen.Cursor().Reset()
 			widgets.NodeTasks.ForNode(nodeID)
 			h.dry.changeView(Tasks)
 			f(viewsToHandlers[Tasks])
@@ -92,7 +94,7 @@ func (h *nodesScreenEventHandler) handle(event *tcell.EventKey, f func(eventHand
 				}
 				f(h)
 			}
-			showFilterInput(newEventSource(forwarder.events()), applyFilter)
+			showFilterInput(h.dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 		}
 	}
 	if !handled {

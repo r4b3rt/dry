@@ -1,3 +1,4 @@
+// Package app is
 package app
 
 import (
@@ -5,8 +6,6 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell"
-	"github.com/moncho/dry/ui"
-	log "github.com/sirupsen/logrus"
 )
 
 var refreshScreen func() error
@@ -18,12 +17,6 @@ type nextHandler func(eh eventHandler)
 //RenderLoop runs dry
 // nolint: gocyclo
 func RenderLoop(dry *Dry) {
-	if ok, err := dry.Ok(); !ok {
-		log.Error(err.Error())
-		return
-	}
-	screen := dry.screen
-	termuiEvents, done := ui.EventChannel()
 
 	//use to signal rendering
 	renderChan := make(chan struct{})
@@ -52,10 +45,11 @@ func RenderLoop(dry *Dry) {
 		defer wg.Done()
 
 		for range renderChan {
-			if !screen.Closing() {
-				screen.Clear()
-				render(dry, screen)
+			if dry.isPaused() {
+				continue
 			}
+			dry.gscreen().Clear()
+			render(dry)
 		}
 	}()
 
@@ -79,7 +73,11 @@ func RenderLoop(dry *Dry) {
 	handler := viewsToHandlers[dry.viewMode()]
 	//main loop that handles termui events
 loop:
-	for event := range termuiEvents {
+	for {
+		event := dry.screen.Poll()
+		if dry.isPaused() {
+			continue
+		}
 		switch ev := event.(type) {
 		case *tcell.EventInterrupt:
 			break loop
@@ -93,16 +91,11 @@ loop:
 			})
 
 		case *tcell.EventResize:
-			screen.Resize()
 			//Reload dry ui elements
 			//TODO widgets.reload()
 		}
 	}
 
-	log.Debug("something broke the loop. Time to die")
-
-	//Close terminal event channel
-	close(done)
 	//make the global refreshScreen func a noop before closing
 	closingLock.Lock()
 	refreshScreen = func() error {

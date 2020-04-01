@@ -18,13 +18,12 @@ type eventHandler interface {
 }
 
 type baseEventHandler struct {
-	dry    *Dry
-	screen *ui.Screen
+	dry *Dry
 }
 
 func (b *baseEventHandler) handle(event *tcell.EventKey, f func(eventHandler)) {
 	dry := b.dry
-	screen := b.screen
+	screen := dry.screen
 	cursor := screen.Cursor()
 	refresh := true
 	switch event.Key() {
@@ -142,90 +141,77 @@ func initHandlers(dry *Dry, screen *ui.Screen) map[viewMode]eventHandler {
 	return map[viewMode]eventHandler{
 		ContainerMenu: &cMenuEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 		},
 		Images: &imagesScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.ImageList,
 		},
 		Networks: &networksScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.Networks,
 		},
 		DiskUsage: &diskUsageScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 		},
 		Main: &containersScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.ContainerList,
 		},
 		Monitor: &monitorScreenEventHandler{
 			baseEventHandler: baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widget: widgets.Monitor,
 		},
 		Nodes: &nodesScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.Nodes,
 		},
 		Tasks: &taskScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.NodeTasks,
 		},
 		Services: &servicesScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.ServiceList,
 		},
 		ServiceTasks: &serviceTasksScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.ServiceTasks,
 		},
 		Stacks: &stacksScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.Stacks,
 		},
 		StackTasks: &stackTasksScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.StackTasks,
 		},
 		Volumes: &volumesScreenEventHandler{
 			baseEventHandler{
-				dry:    dry,
-				screen: screen,
+				dry: dry,
 			},
 			widgets.Volumes,
 		},

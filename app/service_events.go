@@ -25,13 +25,15 @@ func (h *servicesScreenEventHandler) handle(event *tcell.EventKey, f func(eventH
 	case tcell.KeyF5: // refresh
 		h.dry.message("Refreshing the service list")
 		if err := h.widget.Unmount(); err != nil {
-			h.dry.message("There was an error refreshing the service list: " + err.Error())
+			dry.message("There was an error refreshing the service list: " + err.Error())
 		}
 	case tcell.KeyCtrlL:
 		h.showLogs(true, f)
 
 	case tcell.KeyCtrlR:
-		rw := appui.NewPrompt("The selected service will be removed. Do you want to proceed? y/N")
+		rw := appui.NewPrompt(
+			dry.screen.Dimensions(),
+			"The selected service will be removed. Do you want to proceed? y/N")
 		widgets.add(rw)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -55,14 +57,16 @@ func (h *servicesScreenEventHandler) handle(event *tcell.EventKey, f func(eventH
 				return err
 			}
 			if err := h.widget.OnEvent(removeService); err != nil {
-				h.dry.message("There was an error removing the service: " + err.Error())
+				dry.message("There was an error removing the service: " + err.Error())
 			}
 			refreshScreen()
 		}()
 
 	case tcell.KeyCtrlS:
 
-		rw := appui.NewPrompt("Scale service. Number of replicas?")
+		rw := appui.NewPrompt(
+			dry.screen.Dimensions(),
+			"Scale service. Number of replicas?")
 		widgets.add(rw)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -102,7 +106,9 @@ func (h *servicesScreenEventHandler) handle(event *tcell.EventKey, f func(eventH
 			refreshScreen()
 		}()
 	case tcell.KeyCtrlU: //Update service
-		rw := appui.NewPrompt("The selected service will be updated. Do you want to proceed? y/N")
+		rw := appui.NewPrompt(
+			dry.screen.Dimensions(),
+			"The selected service will be updated. Do you want to proceed? y/N")
 		widgets.add(rw)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -132,7 +138,7 @@ func (h *servicesScreenEventHandler) handle(event *tcell.EventKey, f func(eventH
 		}()
 	case tcell.KeyEnter:
 		showTasks := func(serviceID string) error {
-			h.screen.Cursor().Reset()
+			h.dry.screen.Cursor().Reset()
 			widgets.ServiceTasks.ForService(serviceID)
 			f(viewsToHandlers[ServiceTasks])
 			dry.changeView(ServiceTasks)
@@ -154,13 +160,13 @@ func (h *servicesScreenEventHandler) handle(event *tcell.EventKey, f func(eventH
 			}
 			f(h)
 		}
-		showFilterInput(newEventSource(forwarder.events()), applyFilter)
+		showFilterInput(dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 	case 'i' | 'I':
 		handled = true
 		forwarder := newEventForwarder()
 		f(forwarder)
 		inspectService := inspect(
-			h.screen,
+			h.dry.screen,
 			forwarder.events(),
 			func(id string) (interface{}, error) {
 				return h.dry.dockerDaemon.Service(id)
@@ -185,7 +191,7 @@ func (h *servicesScreenEventHandler) handle(event *tcell.EventKey, f func(eventH
 }
 
 func (h *servicesScreenEventHandler) showLogs(withTimestamp bool, f func(eventHandler)) {
-	prompt := logsPrompt()
+	prompt := logsPrompt(h.dry.screen.Dimensions())
 	widgets.add(prompt)
 	forwarder := newEventForwarder()
 	f(forwarder)

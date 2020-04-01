@@ -36,7 +36,9 @@ func (h *imagesScreenEventHandler) handleKeyEvent(key tcell.Key, f func(eventHan
 	case tcell.KeyF5: // refresh
 		h.widget.Unmount()
 	case tcell.KeyCtrlD: //remove dangling images
-		prompt := appui.NewPrompt("Do you want to remove dangling images? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove dangling images? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -70,7 +72,9 @@ func (h *imagesScreenEventHandler) handleKeyEvent(key tcell.Key, f func(eventHan
 
 	case tcell.KeyCtrlE: //remove image
 
-		prompt := appui.NewPrompt("Do you want to remove the selected image? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove the selected image? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -108,7 +112,9 @@ func (h *imagesScreenEventHandler) handleKeyEvent(key tcell.Key, f func(eventHan
 		}()
 
 	case tcell.KeyCtrlF: //force remove image
-		prompt := appui.NewPrompt("Do you want to remove the selected image? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove the selected image? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -146,7 +152,9 @@ func (h *imagesScreenEventHandler) handleKeyEvent(key tcell.Key, f func(eventHan
 		}()
 
 	case tcell.KeyCtrlU: //remove unused images
-		prompt := appui.NewPrompt("Do you want to remove all unused images? (y/N)")
+		prompt := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"Do you want to remove all unused images? (y/N)")
 		widgets.add(prompt)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -182,7 +190,7 @@ func (h *imagesScreenEventHandler) handleKeyEvent(key tcell.Key, f func(eventHan
 		forwarder := newEventForwarder()
 		f(forwarder)
 		inspectImage := inspect(
-			h.screen,
+			h.dry.screen,
 			forwarder.events(),
 			func(id string) (interface{}, error) {
 				return h.dry.dockerDaemon.InspectImage(id)
@@ -220,7 +228,7 @@ func (h *imagesScreenEventHandler) handleChEvent(ch rune, f func(eventHandler)) 
 				f(forwarder)
 				renderer := appui.NewDockerImageHistoryRenderer(history)
 
-				go appui.Less(renderer.String(), h.screen, forwarder.events(), func() {
+				go appui.Less(renderer.String(), h.dry.screen, forwarder.events(), func() {
 					h.dry.changeView(Images)
 					f(h)
 					refreshScreen()
@@ -286,7 +294,7 @@ func (h *imagesScreenEventHandler) handleChEvent(ch rune, f func(eventHandler)) 
 			}
 			f(h)
 		}
-		showFilterInput(newEventSource(forwarder.events()), applyFilter)
+		showFilterInput(dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 	default:
 		handled = false
 	}

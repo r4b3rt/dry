@@ -3,8 +3,6 @@ package ui
 import (
 	"unicode/utf8"
 
-	"github.com/gdamore/tcell"
-
 	"github.com/mattn/go-runewidth"
 )
 
@@ -64,24 +62,4 @@ func vOffsetToCOffset(text []byte, boffset int) (voffset, coffset int) {
 		voffset += runeAdvanceLen(r, voffset)
 	}
 	return
-}
-
-// EventChannel returns a channel on which termbox's events are published.
-func EventChannel() (<-chan tcell.Event, chan struct{}) {
-	events := make(chan tcell.Event)
-	done := make(chan struct{})
-	go func() {
-		defer func() { close(events) }()
-
-		for {
-			events <- ActiveScreen.screen.PollEvent()
-			select {
-			case <-done:
-				return
-			default:
-			}
-		}
-
-	}()
-	return events, done
 }

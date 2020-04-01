@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
@@ -8,7 +9,6 @@ import (
 	"github.com/gdamore/tcell/termbox"
 
 	"github.com/gizak/termui"
-	"github.com/pkg/errors"
 )
 
 //ActiveScreen is the currently active screen
@@ -31,9 +31,9 @@ type Screen struct {
 func NewScreen(theme *ColorTheme) (*Screen, error) {
 	s, err := initScreen()
 	if err != nil {
-		return nil, errors.Wrap(err, "error initializing tcell")
+		return nil, fmt.Errorf("error creating screen: %v", err)
 	}
-	screen := &Screen{}
+	var screen Screen
 	screen.markup = NewMarkup(theme)
 	screen.cursor = &Cursor{pos: 0, downwards: true}
 	screen.theme = theme
@@ -42,18 +42,18 @@ func NewScreen(theme *ColorTheme) (*Screen, error) {
 	screen.themeStyle = mkStyle(
 		screen.markup.Foreground,
 		screen.markup.Background)
-	ActiveScreen = screen
+	ActiveScreen = &screen
 
-	return screen, nil
+	return &screen, nil
 }
 
-// Close gets called upon program termination to close
-func (screen *Screen) Close() *Screen {
+// Close this screen releasing holded resources.
+func (screen *Screen) Close() {
 	screen.Lock()
 	screen.closing = true
 	screen.Unlock()
+	screen.screen.DisableMouse()
 	screen.screen.Fini()
-	return screen
 }
 
 // Closing returns true if this this screen is closing
@@ -69,8 +69,12 @@ func (screen *Screen) Cursor() *Cursor {
 }
 
 //Dimensions returns the screen dimensions
-func (screen *Screen) Dimensions() *Dimensions {
-	return screen.dimensions
+func (screen *Screen) Dimensions() Dimensions {
+	w, h := screen.screen.Size()
+	return Dimensions{
+		Height: h,
+		Width:  w,
+	}
 }
 
 //Fill fills the squared portion of the screen delimited by the given
@@ -87,17 +91,6 @@ func (screen *Screen) Fill(x, y, w, h int, r rune) {
 func (screen *Screen) RenderRune(x, y int, r rune) {
 	screen.screen.SetCell(x, y, screen.themeStyle, r)
 
-}
-
-// Resize resizes this screen
-func (screen *Screen) Resize() {
-	w, h := screen.screen.Size()
-
-	if w > 0 && h > 0 {
-		screen.Lock()
-		screen.dimensions.Width, screen.dimensions.Height = w, h
-		screen.Unlock()
-	}
 }
 
 //Clear makes the entire screen blank using default background color.
@@ -139,12 +132,11 @@ func (screen *Screen) HideCursor() {
 	screen.screen.HideCursor()
 }
 
-// Flush makes all the content visible on the display.
-func (screen *Screen) Flush() *Screen {
+// Flush screen content to the display.
+func (screen *Screen) Flush() {
 	screen.Lock()
 	defer screen.Unlock()
 	screen.screen.Show()
-	return screen
 }
 
 // RenderBufferer renders all Bufferer in the given order from left to right,
@@ -204,6 +196,11 @@ func (screen *Screen) RenderAtColumn(column, initialRow int, str string) {
 //ShowCursor shows the cursor on the given position
 func (screen *Screen) ShowCursor(x, y int) {
 	screen.screen.ShowCursor(x, y)
+}
+
+// Poll waits for the next terminal event.
+func (screen *Screen) Poll() tcell.Event {
+	return screen.screen.PollEvent()
 }
 
 func toTmAttr(x termui.Attribute) termbox.Attribute {

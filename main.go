@@ -17,7 +17,6 @@ import (
 	"github.com/moncho/dry/docker"
 	"github.com/moncho/dry/ui"
 	"github.com/moncho/dry/version"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -83,7 +82,7 @@ func config(opts options) (app.Config, error) {
 		cfg.MonitorMode = true
 		refreshRate, err := strconv.Atoi(opts.MonitorMode)
 		if err != nil {
-			return cfg, errors.Wrap(err, "invalid refresh rate")
+			return cfg, fmt.Errorf("invalid refresh rate: %w", err)
 		}
 		cfg.MonitorRefreshRate = refreshRate
 	}
@@ -202,5 +201,5 @@ func main() {
 		return
 	}
 	app.RenderLoop(dry)
-	screen.Close()
+	dry.Close()
 }

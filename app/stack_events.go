@@ -31,7 +31,9 @@ func (h *stacksScreenEventHandler) handle(event *tcell.EventKey, f func(eventHan
 		}
 		h.widget.OnEvent(showTasks)
 	case tcell.KeyCtrlR: //remove stack
-		rw := appui.NewPrompt("The selected stack will be removed. Do you want to proceed? y/N")
+		rw := appui.NewPrompt(
+			h.dry.screen.Dimensions(),
+			"The selected stack will be removed. Do you want to proceed? y/N")
 		widgets.add(rw)
 		forwarder := newEventForwarder()
 		f(forwarder)
@@ -80,7 +82,7 @@ func (h *stacksScreenEventHandler) handle(event *tcell.EventKey, f func(eventHan
 				}
 				f(h)
 			}
-			showFilterInput(newEventSource(forwarder.events()), applyFilter)
+			showFilterInput(h.dry.screen.Dimensions(), newEventSource(forwarder.events()), applyFilter)
 		}
 	}
 	if handled {

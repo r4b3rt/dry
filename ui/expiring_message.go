@@ -5,22 +5,25 @@ import (
 	"time"
 )
 
+// RenderLine renders the given string in x, y coordinates.
+type RenderLine func(x int, y int, str string)
+
 // ExpiringMessageWidget shows some text for an amount time then clears itself
 type ExpiringMessageWidget struct {
 	y           int
 	screenWidth int
 	clearTimer  *time.Timer
-	screen      *Screen
+	renderLine  RenderLine
 
 	sync.RWMutex
 	message string
 }
 
 // NewExpiringMessageWidget creates a new ExpiringMessageWidget struct
-func NewExpiringMessageWidget(y int, screen *Screen) *ExpiringMessageWidget {
+func NewExpiringMessageWidget(y int, r RenderLine) *ExpiringMessageWidget {
 	return &ExpiringMessageWidget{
 		y:          y,
-		screen:     screen,
+		renderLine: r,
 		clearTimer: nil,
 	}
 
@@ -67,5 +70,5 @@ func (s *ExpiringMessageWidget) Render() {
 	if s.message == "" {
 		return
 	}
-	s.screen.RenderLine(0, s.y, s.message)
+	s.renderLine(0, s.y, s.message)
 }

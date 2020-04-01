@@ -5,16 +5,23 @@ import (
 	"strconv"
 
 	termui "github.com/gizak/termui"
+	drydocker "github.com/moncho/dry/docker"
 	drytermui "github.com/moncho/dry/ui/termui"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/go-units"
 
-	"github.com/moncho/dry/docker"
 	"github.com/moncho/dry/ui"
 	"github.com/olekukonko/tablewriter"
 )
+
+// DockerInformation provides Docker information.
+type DockerInformation interface {
+	DockerEnv() drydocker.Env
+	Info() (types.Info, error)
+	Version() (*types.Version, error)
+}
 
 //DockerInfo is a widget to show Docker info
 type DockerInfo struct {
@@ -22,8 +29,8 @@ type DockerInfo struct {
 }
 
 //NewDockerInfo creates a DockerInfo widget
-func NewDockerInfo(daemon docker.ContainerDaemon) *DockerInfo {
-	di := drytermui.NewParFromMarkupText(DryTheme, dockerInfo(daemon))
+func NewDockerInfo(docker DockerInformation) *DockerInfo {
+	di := drytermui.NewParFromMarkupText(DryTheme, dockerInfo(docker))
 	di.BorderTop = false
 	di.BorderBottom = true
 	di.BorderLeft = false
@@ -38,9 +45,9 @@ func NewDockerInfo(daemon docker.ContainerDaemon) *DockerInfo {
 	return &DockerInfo{di}
 }
 
-func dockerInfo(daemon docker.ContainerDaemon) string {
-	version, _ := daemon.Version()
-	info, _ := daemon.Info()
+func dockerInfo(docker DockerInformation) string {
+	version, _ := docker.Version()
+	info, _ := docker.Info()
 
 	swarmInfo := info.Swarm
 
@@ -48,13 +55,13 @@ func dockerInfo(daemon docker.ContainerDaemon) string {
 
 	rows := [][]string{
 		{
-			ui.Blue("Docker Host:"), ui.Yellow(daemon.DockerEnv().DockerHost), "",
+			ui.Blue("Docker Host:"), ui.Yellow(docker.DockerEnv().DockerHost), "",
 			ui.Blue("Docker Version:"), ui.Yellow(version.Version)},
 		{
-			ui.Blue("Cert Path:"), ui.Yellow(daemon.DockerEnv().DockerCertPath), "",
+			ui.Blue("Cert Path:"), ui.Yellow(docker.DockerEnv().DockerCertPath), "",
 			ui.Blue("APIVersion:"), ui.Yellow(version.APIVersion)},
 		{
-			ui.Blue("Verify Certificate:"), ui.Yellow(strconv.FormatBool(daemon.DockerEnv().DockerTLSVerify)), "",
+			ui.Blue("Verify Certificate:"), ui.Yellow(strconv.FormatBool(docker.DockerEnv().DockerTLSVerify)), "",
 			ui.Blue("OS/Arch/Kernel:"), ui.Yellow(version.Os + "/" + version.Arch + "/" + version.KernelVersion)},
 	}
 
