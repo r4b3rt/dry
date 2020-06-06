@@ -29,9 +29,7 @@ func render(d *Dry) {
 				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, cMenu)
-
 			keymap = commandsMenuBar
-
 		}
 	case Main:
 		{
@@ -41,19 +39,15 @@ func render(d *Dry) {
 			}
 			bufferers = append(bufferers, containersWidget)
 			keymap = keyMappings
-
 		}
 	case Images:
 		{
-
 			widget := widgets.ImageList
 			if err := widget.Mount(); err != nil {
 				d.screen.Render(1, err.Error())
 			}
 			bufferers = append(bufferers, widget)
-
 			keymap = imagesKeyMappings
-
 		}
 	case Networks:
 		{
@@ -156,7 +150,6 @@ func render(d *Dry) {
 }
 
 func footer(mapping string) *termui.MarkupPar {
-
 	d := ui.ActiveScreen.Dimensions()
 	par := termui.NewParFromMarkupText(appui.DryTheme, mapping)
 	par.SetX(0)
@@ -165,6 +158,5 @@ func footer(mapping string) *termui.MarkupPar {
 	par.Width = d.Width
 	par.TextBgColor = gizaktermui.Attribute(appui.DryTheme.Footer)
 	par.Bg = gizaktermui.Attribute(appui.DryTheme.Footer)
-
 	return par
 }

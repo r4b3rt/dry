@@ -12,8 +12,6 @@ var refreshScreen func() error
 var refreshIfView func(v viewMode) error
 var widgets *widgetRegistry
 
-type nextHandler func(eh eventHandler)
-
 //RenderLoop runs dry
 // nolint: gocyclo
 func RenderLoop(dry *Dry) {
@@ -57,16 +55,9 @@ func RenderLoop(dry *Dry) {
 
 	go func() {
 		statusBar := widgets.MessageBar
-		for {
-			select {
-			case dryMessage, ok := <-dryOutputChan:
-				if ok {
-					statusBar.Message(dryMessage, 10*time.Second)
-					statusBar.Render()
-				} else {
-					return
-				}
-			}
+		for dryMessage := range dryOutputChan {
+			statusBar.Message(dryMessage, 10*time.Second)
+			statusBar.Render()
 		}
 	}()
 

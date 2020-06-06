@@ -252,7 +252,6 @@ func (h *containersScreenEventHandler) handleCharacter(key rune, f func(eventHan
 		refreshScreen()
 
 	case 'a', 'A': //attach
-
 		if err := h.widget.OnEvent(
 			func(id string) error {
 				ctx, cancel := context.WithCancel(context.Background())
