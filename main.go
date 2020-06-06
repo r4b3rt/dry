@@ -11,6 +11,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
+	"github.com/docker/docker/pkg/term"
 	"github.com/jessevdk/go-flags"
 	"github.com/moncho/dry/app"
 	"github.com/moncho/dry/appui"
@@ -171,6 +172,21 @@ func main() {
 			log.Fatal(http.ListenAndServe("localhost:6060", nil))
 		}()
 	}
+	// Terminal state is saved and restored on exit.
+	for _, f := range [...]*os.File{os.Stdin, os.Stdout, os.Stderr} {
+		fd, _ := term.GetFdInfo(f)
+		state, err := term.SaveState(fd)
+		if err != nil {
+			return
+		}
+		defer func(fd uintptr, s *term.State) {
+			err := term.RestoreTerminal(fd, state)
+			if err != nil {
+				panic(err)
+			}
+		}(fd, state)
+	}
+
 	screen, err := ui.NewScreen(appui.DryTheme)
 	if err != nil {
 		log.Printf("Dry could not start: %s", err)
