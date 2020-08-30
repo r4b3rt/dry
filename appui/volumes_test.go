@@ -60,11 +60,11 @@ func TestVolumesWidget(t *testing.T) {
 			args{
 				testVolumesService{
 					volumes: []*types.Volume{
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume1",
 						},
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume2",
 						},
@@ -84,21 +84,21 @@ func TestVolumesWidget(t *testing.T) {
 			args{
 				testVolumesService{
 					volumes: []*types.Volume{
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume1",
 						},
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume2",
 						},
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume3",
-						}, &types.Volume{
+						}, {
 							Driver: "local",
 							Name:   "volume4",
-						}, &types.Volume{
+						}, {
 							Driver: "local",
 							Name:   "volume5",
 						},
@@ -118,19 +118,23 @@ func TestVolumesWidget(t *testing.T) {
 			args{
 				testVolumesService{
 					volumes: []*types.Volume{
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume1",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume2",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume3",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume4",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume5",
 						},
@@ -152,19 +156,23 @@ func TestVolumesWidget(t *testing.T) {
 			args{
 				testVolumesService{
 					volumes: []*types.Volume{
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume5",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume4",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume3",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume2",
-						}, &types.Volume{
+						},
+						{
 							Driver: "local",
 							Name:   "volume1",
 						},
@@ -185,19 +193,19 @@ func TestVolumesWidget(t *testing.T) {
 			args{
 				testVolumesService{
 					volumes: []*types.Volume{
-						&types.Volume{
+						{
 							Driver: "local1",
 							Name:   "volume5",
-						}, &types.Volume{
+						}, {
 							Driver: "local1",
 							Name:   "volume4",
-						}, &types.Volume{
+						}, {
 							Driver: "local2",
 							Name:   "volume3",
-						}, &types.Volume{
+						}, {
 							Driver: "local2",
 							Name:   "volume2",
-						}, &types.Volume{
+						}, {
 							Driver: "local2",
 							Name:   "volume1",
 						},
@@ -219,19 +227,19 @@ func TestVolumesWidget(t *testing.T) {
 			args{
 				testVolumesService{
 					volumes: []*types.Volume{
-						&types.Volume{
+						{
 							Driver: "local",
 							Name:   "volume5",
-						}, &types.Volume{
+						}, {
 							Driver: "local",
 							Name:   "volume4",
-						}, &types.Volume{
+						}, {
 							Driver: "local",
 							Name:   "volume3",
-						}, &types.Volume{
+						}, {
 							Driver: "local",
 							Name:   "volume2",
-						}, &types.Volume{
+						}, {
 							Driver: "local",
 							Name:   "volume1",
 						},
@@ -259,10 +267,15 @@ func TestVolumesWidget(t *testing.T) {
 
 			golden := filepath.Join("testdata", strings.ReplaceAll(tt.name, " ", "_")+".golden")
 			if *update {
-				ioutil.WriteFile(golden, []byte(got), 0644)
+				if err := ioutil.WriteFile(golden, []byte(got), 0644); err != nil {
+					t.Fatal(err)
+				}
+
 			}
 			want, err := ioutil.ReadFile(golden)
-
+			if err != nil {
+				t.Fatal(err)
+			}
 			if got != string(want) {
 				t.Errorf("NewVolumesWidget() = %v, want %v", got, string(want))
 			}

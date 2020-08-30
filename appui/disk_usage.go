@@ -77,7 +77,7 @@ func (r *DockerDiskUsageRenderer) String() string {
 	}
 
 	var buffer bytes.Buffer
-	r.diskUsageTableTemplate.Execute(&buffer, vars)
+	_ = r.diskUsageTableTemplate.Execute(&buffer, vars)
 
 	return buffer.String()
 }

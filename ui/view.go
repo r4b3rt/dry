@@ -81,7 +81,6 @@ func (v *View) Position() (x, y int) {
 // Write appends a byte slice into the view's internal buffer, as defined
 // by the io.Writer interface.
 func (v *View) Write(p []byte) (n int, err error) {
-
 	for _, ch := range bytes.Runes(p) {
 		switch ch {
 		case '\n':

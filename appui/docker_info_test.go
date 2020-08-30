@@ -21,7 +21,7 @@ func TestDockerInfo(t *testing.T) {
 	di := NewDockerInfo(daemon)
 
 	if di == nil {
-		t.Error("Docker info widget is nil")
+		t.Fatal("Docker info widget is nil")
 	}
 	content := di.Buffer()
 	if content.Area.Dy() != di.GetHeight() {

@@ -9,7 +9,6 @@ import (
 //Prompt is a prompt widget
 type Prompt struct {
 	termui.TextInput
-	screen Screen
 }
 
 //NewPrompt creates a new Prompt with the given title

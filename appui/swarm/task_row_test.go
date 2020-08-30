@@ -23,7 +23,7 @@ func TestTaskRow(t *testing.T) {
 	row := NewTaskRow(client, task, taskTableHeader())
 
 	if row == nil {
-		t.Error("TaskRow was not created")
+		t.Fatal("TaskRow was not created")
 	}
 
 	if row.Name.Text != "Service1.1" {

@@ -19,7 +19,7 @@ func TestStatsRow(t *testing.T) {
 
 	row := NewContainerStatsRow(container, NewMonitorTableHeader())
 	if row == nil {
-		t.Error("Stats row was not created")
+		t.Fatal("Stats row was not created")
 	}
 	if row.container != container {
 		t.Error("Stats row does not hold a reference to the container.")

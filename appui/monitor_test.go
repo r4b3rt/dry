@@ -36,10 +36,6 @@ func (screenBuffererRender) RenderBufferer(bs ...termui.Bufferer) {
 }
 
 func TestMonitor_RepeatedUnmount(t *testing.T) {
-	type fields struct {
-		daemon   DockerMonitor
-		renderer ScreenBuffererRender
-	}
 	m := NewMonitor(dockerMonitor{}, screenBuffererRender{})
 	m.Mount()
 	m.Unmount()

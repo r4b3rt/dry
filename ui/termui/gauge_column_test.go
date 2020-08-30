@@ -6,7 +6,7 @@ func TestGaugeColumn(t *testing.T) {
 	c := NewGaugeColumn()
 
 	if c == nil {
-		t.Error("GaugeColumn is nil")
+		t.Fatal("GaugeColumn is nil")
 	}
 
 	if c.Border {

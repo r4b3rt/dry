@@ -11,7 +11,7 @@ func TestNewList(t *testing.T) {
 	l := NewList(theme)
 
 	if l == nil {
-		t.Error("List is nil")
+		t.Fatal("List is nil")
 	}
 
 	if l.Bg != termui.Attribute(theme.Bg) {

@@ -36,7 +36,7 @@ func TestServiceInfo(t *testing.T) {
 	di := NewServiceInfoWidget(daemon, testService, screen)
 
 	if di == nil {
-		t.Error("Service info widget is nil")
+		t.Fatal("Service info widget is nil")
 	}
 	content := di.Buffer()
 	if content.Area.Dy() != di.GetHeight() {
@@ -74,7 +74,9 @@ func Test_serviceInfo(t *testing.T) {
 
 			golden := filepath.Join("testdata", tt.name+".golden")
 			if *updateGoldenFiles {
-				ioutil.WriteFile(golden, []byte(got), 0644)
+				if err := ioutil.WriteFile(golden, []byte(got), 0644); err != nil {
+					t.Fatal(err)
+				}
 			}
 			expected, _ := ioutil.ReadFile(golden)
 

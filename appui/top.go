@@ -3,7 +3,6 @@ package appui
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -36,16 +35,10 @@ func (r *topRenderer) String() string {
 
 	w := tabwriter.NewWriter(buf, 20, 1, 3, ' ', 0)
 
-	io.WriteString(w, "<yellow><b>PROCESS LIST</></>\n\n")
-
-	fmt.Fprintln(w,
-		fmt.Sprintf("<blue>%s</>",
-			strings.Join(procList.Titles, "\t")))
-
+	fmt.Fprint(w, "<yellow><b>PROCESS LIST</></>\n\n")
+	fmt.Fprintf(w, "<blue>%s</>\n", strings.Join(procList.Titles, "\t"))
 	for _, proc := range procList.Processes {
-		fmt.Fprintln(w,
-			fmt.Sprintf("<white>%s</>",
-				strings.Join(proc, "\t")))
+		fmt.Fprintf(w, "<white>%s</>\n", strings.Join(proc, "\t"))
 	}
 	w.Flush()
 	return buf.String()

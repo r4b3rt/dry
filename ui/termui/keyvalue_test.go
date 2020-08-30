@@ -9,7 +9,7 @@ import (
 func TestKeyValue(t *testing.T) {
 	kvp := NewKeyValuePar("key", "value", &ui.ColorTheme{})
 	if kvp == nil {
-		t.Error("KeyValuePar is nil")
+		t.Fatal("KeyValuePar is nil")
 	}
 
 	if kvp.key.Text != "key:" {

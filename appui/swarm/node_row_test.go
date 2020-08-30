@@ -31,7 +31,7 @@ func TestNodeRow(t *testing.T) {
 	row := NewNodeRow(node, nodeTableHeader())
 
 	if row == nil {
-		t.Error("NodeRow was not created")
+		t.Fatal("NodeRow was not created")
 	}
 
 	if row.Name.Text != node.Description.Hostname {

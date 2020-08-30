@@ -10,10 +10,9 @@ type RenderLine func(x int, y int, str string)
 
 // ExpiringMessageWidget shows some text for an amount time then clears itself
 type ExpiringMessageWidget struct {
-	y           int
-	screenWidth int
-	clearTimer  *time.Timer
-	renderLine  RenderLine
+	y          int
+	clearTimer *time.Timer
+	renderLine RenderLine
 
 	sync.RWMutex
 	message string
@@ -66,7 +65,7 @@ func (s *ExpiringMessageWidget) Message(msg string, clearDelay time.Duration) {
 //Render renders the status message
 func (s *ExpiringMessageWidget) Render() {
 	s.RLock()
-	s.RUnlock()
+	defer s.RUnlock()
 	if s.message == "" {
 		return
 	}

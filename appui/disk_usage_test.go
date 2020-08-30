@@ -19,7 +19,7 @@ func TestDiskUsageRendererCreation(t *testing.T) {
 	r := NewDockerDiskUsageRenderer(screenHeight)
 
 	if r == nil {
-		t.Error("DiskUsageRenderer was not created")
+		t.Fatal("DiskUsageRenderer was not created")
 	}
 
 	if r.height != screenHeight {
@@ -65,7 +65,8 @@ func TestDockerDiskUsageRenderer_Render(t *testing.T) {
 
 			golden := filepath.Join("testdata", tt.name+".golden")
 			if *update {
-				ioutil.WriteFile(golden, []byte(actual), 0644)
+				err := ioutil.WriteFile(golden, []byte(actual), 0644)
+				t.Fatal(err)
 			}
 			expected, _ := ioutil.ReadFile(golden)
 			if string(expected) != actual {

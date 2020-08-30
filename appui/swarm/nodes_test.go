@@ -27,7 +27,7 @@ func TestNodesWidgetCreation(t *testing.T) {
 		cursor:     ui.NewCursor()}
 	w := NewNodesWidget(&mocks.SwarmDockerDaemon{}, screen)
 	if w == nil {
-		t.Error("Swarm widget is nil")
+		t.Fatal("Swarm widget is nil")
 	}
 	if w.swarmClient == nil {
 		t.Error("Swarm widget does not have a reference to the swarmclient")
@@ -49,7 +49,9 @@ func TestNodesWidgetMount(t *testing.T) {
 		t.Errorf("Swarm widget is not showing the expected number of totalRows. Got: %d", len(w.totalRows))
 	}
 
-	w.Mount()
+	if err := w.Mount(); err != nil {
+		t.Fatal(err)
+	}
 
 	if len(w.totalRows) != 1 {
 		t.Errorf("Swarm widget is not showing the expected number of totalRows. Got: %d", len(w.totalRows))

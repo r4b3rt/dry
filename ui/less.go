@@ -65,11 +65,11 @@ func (less *Less) Focus(events <-chan *tcell.EventKey) error {
 	}
 	inputMode := false
 
+	var err error
 	//This ensures at least one refresh
 	less.refreshBuffer()
 
 	go func(inputMode *bool) {
-
 		inputBoxEventChan := make(chan *tcell.EventKey)
 		inputBoxOutput := make(chan string, 1)
 		defer close(inputBoxOutput)
@@ -77,10 +77,12 @@ func (less *Less) Focus(events <-chan *tcell.EventKey) error {
 
 		for {
 			select {
-
 			case input := <-inputBoxOutput:
 				*inputMode = false
-				less.search(input)
+				if searchErr := less.search(input); searchErr != nil {
+					err = searchErr
+					return
+				}
 				less.refreshBuffer()
 			case event := <-events:
 				if !*inputMode {
@@ -133,7 +135,7 @@ func (less *Less) Focus(events <-chan *tcell.EventKey) error {
 			less.screen.Flush()
 		}
 	}
-	return nil
+	return err
 }
 
 //Search searches in the view buffer for the given pattern

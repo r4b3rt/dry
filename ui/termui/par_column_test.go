@@ -8,7 +8,7 @@ func TestParColumn(t *testing.T) {
 	p := NewParColumn(text)
 
 	if p == nil {
-		t.Error("ParColumn is nil")
+		t.Fatal("ParColumn is nil")
 	}
 
 	if p.Text != text {
