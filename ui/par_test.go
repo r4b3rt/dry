@@ -12,7 +12,7 @@ func TestNewPar(t *testing.T) {
 	p := NewPar("test", theme)
 
 	if p == nil {
-		t.Error("Par is nil")
+		t.Fatal("Par is nil")
 	}
 	if p.Text != "test" {
 		t.Errorf("Par does not have expected text, got: %s ", p.Text)

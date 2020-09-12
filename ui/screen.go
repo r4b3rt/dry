@@ -147,7 +147,6 @@ func (screen *Screen) RenderBufferer(bs ...termui.Bufferer) {
 	defer screen.Unlock()
 	for _, b := range bs {
 		buf := b.Buffer()
-		// set cels in buf
 		for p, c := range buf.CellMap {
 			if p.In(buf.Area) {
 				s := mkStyle(toTmAttr(c.Fg), toTmAttr(c.Bg))
@@ -180,20 +179,20 @@ func (screen *Screen) RenderLine(x int, y int, str string) {
 	}
 }
 
-//Render renders the given content starting from the given row
+// Render renders the given content starting from the given row
 func (screen *Screen) Render(row int, str string) {
 	screen.RenderAtColumn(0, row, str)
 }
 
-//RenderAtColumn renders the given content starting from
-//the given row at the given column
+// RenderAtColumn renders the given content starting from
+// the given row at the given column
 func (screen *Screen) RenderAtColumn(column, initialRow int, str string) {
 	for row, line := range strings.Split(str, "\n") {
 		screen.RenderLine(column, initialRow+row, line)
 	}
 }
 
-//ShowCursor shows the cursor on the given position
+// ShowCursor shows the cursor on the given position
 func (screen *Screen) ShowCursor(x, y int) {
 	screen.screen.ShowCursor(x, y)
 }
