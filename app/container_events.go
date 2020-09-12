@@ -252,35 +252,9 @@ func (h *containersScreenEventHandler) handleCharacter(key rune, f func(eventHan
 		refreshScreen()
 
 	case 'a', 'A': //attach
-		if err := h.widget.OnEvent(
-			func(id string) error {
-				ctx, cancel := context.WithCancel(context.Background())
-				defer cancel()
-				dry.pause()
-				pos := dry.screen.Cursor().Position()
-				height, width := dry.screen.Dimensions().Height, dry.screen.Dimensions().Width
-				dry.screen.ClearAndFlush()
-				dry.screen.Sync()
-				dry.screen.Close()
-				execerr := dry.dockerDaemon.Exec(ctx, id, docker.ExecConfig{
-					Height: uint(height),
-					Width:  uint(width),
-					Cmd:    []string{"bash"},
-				})
-				dry.resume()
-				s, err := ui.NewScreen(appui.DryTheme)
-				// TODO Quit dry if a new screen could not be created.
-				if err != nil {
-					return err
-				}
-				s.HideCursor()
-				s.Cursor().ScrollTo(pos)
-				dry.sscreen(s)
-				return execerr
-			}); err != nil {
-			h.dry.message("Could not run command: " + err.Error())
+		if err := h.widget.OnEvent(attach(dry)); err != nil {
+			dry.message("Could not run command: " + err.Error())
 		}
-
 	case 'e', 'E': //remove
 		if err := h.widget.OnEvent(
 			func(id string) error {
@@ -585,4 +559,32 @@ func (h *containersScreenEventHandler) showLogs(id string, withTimestamp bool, f
 			h.dry.message("Error showing container logs: " + err.Error())
 		}
 	}()
+}
+
+func attach(dry *Dry) func(id string) error {
+	return func(id string) error {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		dry.pause()
+		pos := dry.screen.Cursor().Position()
+		height, width := dry.screen.Dimensions().Height, dry.screen.Dimensions().Width
+		dry.screen.ClearAndFlush()
+		dry.screen.Sync()
+		dry.screen.Close()
+		execerr := dry.dockerDaemon.Exec(ctx, id, docker.ExecConfig{
+			Height: uint(height),
+			Width:  uint(width),
+			Cmd:    []string{"bash"},
+		})
+		dry.resume()
+		s, err := ui.NewScreen(appui.DryTheme)
+		// TODO Quit dry if a new screen could not be created.
+		if err != nil {
+			return err
+		}
+		s.HideCursor()
+		s.Cursor().ScrollTo(pos)
+		dry.sscreen(s)
+		return execerr
+	}
 }
