@@ -3,11 +3,18 @@ package app
 import (
 	"sync"
 
+	"github.com/gizak/termui"
 	"github.com/moncho/dry/appui"
 	"github.com/moncho/dry/appui/swarm"
 	"github.com/moncho/dry/ui"
-	"github.com/moncho/dry/ui/termui"
 )
+
+type widget interface {
+	termui.Bufferer
+	Mount() error
+	Unmount() error
+	Name() string
+}
 
 //widgetRegistry holds references to two types of widgets:
 // * widgets that hold information that does not change or widgets
@@ -32,10 +39,10 @@ type widgetRegistry struct {
 	StackTasks    *swarm.StacksTasksWidget
 	Volumes       *appui.VolumesWidget
 	sync.RWMutex
-	widgets map[string]termui.Widget
+	widgets map[string]widget
 }
 
-func (wr *widgetRegistry) add(w termui.Widget) error {
+func (wr *widgetRegistry) add(w widget) error {
 	wr.Lock()
 	defer wr.Unlock()
 	err := w.Mount()
@@ -45,17 +52,17 @@ func (wr *widgetRegistry) add(w termui.Widget) error {
 	return err
 }
 
-func (wr *widgetRegistry) remove(w termui.Widget) error {
+func (wr *widgetRegistry) remove(w widget) error {
 	wr.Lock()
 	defer wr.Unlock()
 	delete(wr.widgets, w.Name())
 	return w.Unmount()
 }
 
-func (wr *widgetRegistry) activeWidgets() []termui.Widget {
+func (wr *widgetRegistry) activeWidgets() []widget {
 	wr.RLock()
 	defer wr.RUnlock()
-	widgets := make([]termui.Widget, len(wr.widgets))
+	widgets := make([]widget, len(wr.widgets))
 	i := 0
 	for _, widget := range wr.widgets {
 		widgets[i] = widget

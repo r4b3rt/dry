@@ -153,7 +153,7 @@ func initRegistry(dry *Dry) *widgetRegistry {
 		ServiceList:   swarm.NewServicesWidget(daemon, widgetScreen),
 		Stacks:        swarm.NewStacksWidget(daemon, widgetScreen),
 		StackTasks:    swarm.NewStacksTasksWidget(daemon, widgetScreen),
-		widgets:       make(map[string]termui.Widget),
+		widgets:       make(map[string]widget),
 		MessageBar:    ui.NewExpiringMessageWidget(0, dry.screen.RenderAtColumn),
 		Volumes:       appui.NewVolumesWidget(daemon, widgetScreen),
 	}
