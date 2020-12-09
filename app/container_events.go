@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/gdamore/tcell"
@@ -172,7 +173,6 @@ func (h *containersScreenEventHandler) handleCommand(command commandRunner, f fu
 			}
 			refreshScreen()
 		}()
-
 	case docker.STATS:
 		c := dry.dockerDaemon.ContainerByID(id)
 		if c == nil || !docker.IsContainerRunning(c) {
@@ -252,7 +252,38 @@ func (h *containersScreenEventHandler) handleCharacter(key rune, f func(eventHan
 		refreshScreen()
 
 	case 'a', 'A': //attach
-		if err := h.widget.OnEvent(attach(dry)); err != nil {
+		if err := h.widget.OnEvent(
+			func(id string) error {
+				prompt := appui.NewPrompt(
+					dry.screen.Dimensions(),
+					"Command to run (default: bash)? ")
+				widgets.add(prompt)
+				forwarder := newEventForwarder()
+				f(forwarder)
+				refreshScreen()
+				go func() {
+					events := ui.EventSource{
+						Events: forwarder.events(),
+						EventHandledCallback: func(e *tcell.EventKey) error {
+							return refreshScreen()
+						},
+					}
+					prompt.OnFocus(events)
+					command, cancel := prompt.Text()
+					f(h)
+					widgets.remove(prompt)
+					if cancel {
+						return
+					}
+					if command == "" {
+						command = "bash"
+					}
+					if err := attach(dry, command)(id); err != nil {
+						h.dry.message("Error attaching to container: " + err.Error())
+					}
+				}()
+				return nil
+			}); err != nil {
 			dry.message("Could not run command: " + err.Error())
 		}
 	case 'e', 'E': //remove
@@ -270,7 +301,6 @@ func (h *containersScreenEventHandler) handleCharacter(key rune, f func(eventHan
 			}); err != nil {
 			h.dry.message("There was an error removing the container: " + err.Error())
 		}
-
 	case 'i', 'I': //inspect
 		if err := h.widget.OnEvent(
 			func(id string) error {
@@ -561,20 +591,21 @@ func (h *containersScreenEventHandler) showLogs(id string, withTimestamp bool, f
 	}()
 }
 
-func attach(dry *Dry) func(id string) error {
+func attach(dry *Dry, command string) func(id string) error {
 	return func(id string) error {
+		fmt.Fprint(os.Stderr, "attaching\n")
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		dry.pause()
 		pos := dry.screen.Cursor().Position()
 		height, width := dry.screen.Dimensions().Height, dry.screen.Dimensions().Width
-		dry.screen.ClearAndFlush()
+		dry.screen.Clear()
 		dry.screen.Sync()
 		dry.screen.Close()
 		execerr := dry.dockerDaemon.Exec(ctx, id, docker.ExecConfig{
 			Height: uint(height),
 			Width:  uint(width),
-			Cmd:    []string{"bash"},
+			Cmd:    []string{command},
 		})
 		dry.resume()
 		s, err := ui.NewScreen(appui.DryTheme)

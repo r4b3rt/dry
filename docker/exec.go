@@ -18,17 +18,12 @@ type ExecConfig struct {
 
 // Exec runs docker exec on a container.
 func (daemon *Daemon) Exec(ctx context.Context, cid string, config ExecConfig) error {
-
 	execConfig := types.ExecConfig{
 		Tty:          true,
 		AttachStderr: true,
 		AttachStdin:  true,
 		AttachStdout: true,
 		Cmd:          config.Cmd,
-	}
-
-	if _, err := daemon.client.ContainerInspect(ctx, cid); err != nil {
-		return err
 	}
 
 	response, err := daemon.client.ContainerExecCreate(ctx, cid, execConfig)

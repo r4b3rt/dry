@@ -41,11 +41,7 @@ func RenderLoop(dry *Dry) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-
 		for range renderChan {
-			if dry.isPaused() {
-				continue
-			}
 			dry.gscreen().Clear()
 			render(dry)
 		}
@@ -62,28 +58,29 @@ func RenderLoop(dry *Dry) {
 	}()
 
 	handler := viewsToHandlers[dry.viewMode()]
-	//main loop that handles termui events
+	//main loop handles terminal events
 loop:
 	for {
-		event := dry.screen.Poll()
-		if dry.isPaused() {
-			continue
-		}
-		switch ev := event.(type) {
-		case *tcell.EventInterrupt:
-			break loop
-		case *tcell.EventKey:
-			//Ctrl+C breaks the loop (and exits dry) no matter what
-			if ev.Key() == tcell.KeyCtrlC || ev.Rune() == 'Q' {
+		select {
+		case <-dry.pauseMe:
+			<-dry.play
+		default:
+			event := dry.screen.Poll()
+			switch ev := event.(type) {
+			case *tcell.EventInterrupt:
 				break loop
+			case *tcell.EventKey:
+				//Ctrl+C breaks the loop (and exits dry) no matter what
+				if ev.Key() == tcell.KeyCtrlC || ev.Rune() == 'Q' {
+					break loop
+				}
+				handler.handle(ev, func(eh eventHandler) {
+					handler = eh
+				})
+			case *tcell.EventResize:
+				//Reload dry ui elements
+				//TODO widgets.reload()
 			}
-			handler.handle(ev, func(eh eventHandler) {
-				handler = eh
-			})
-
-		case *tcell.EventResize:
-			//Reload dry ui elements
-			//TODO widgets.reload()
 		}
 	}
 

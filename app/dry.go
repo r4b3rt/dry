@@ -22,12 +22,13 @@ type Dry struct {
 	dockerDaemon     docker.ContainerDaemon
 	dockerEvents     <-chan events.Message
 	dockerEventsDone chan<- struct{}
+	pauseMe          chan struct{}
+	play             chan struct{}
 	output           chan string
 	showHeader       bool
 
 	sync.RWMutex
 	view   viewMode
-	paused bool
 	screen *ui.Screen
 }
 
@@ -45,6 +46,8 @@ func (d *Dry) Close() {
 	d.screen.Close()
 	close(d.dockerEventsDone)
 	close(d.output)
+	close(d.pauseMe)
+	close(d.play)
 }
 
 //OuputChannel returns the channel where dry messages are written
@@ -100,21 +103,11 @@ func (d *Dry) viewMode() viewMode {
 	return d.view
 }
 
-func (d *Dry) isPaused() bool {
-	d.RLock()
-	defer d.RUnlock()
-	return d.paused
-}
-
 func (d *Dry) pause() {
-	d.Lock()
-	defer d.Unlock()
-	d.paused = true
+	d.pauseMe <- struct{}{}
 }
 func (d *Dry) resume() {
-	d.Lock()
-	defer d.Unlock()
-	d.paused = false
+	d.play <- struct{}{}
 }
 
 func (d *Dry) gscreen() *ui.Screen {
@@ -182,6 +175,8 @@ func newDry(screen *ui.Screen, d docker.ContainerDaemon) (*Dry, error) {
 	dry.dockerEvents = dockerEvents
 	dry.dockerEventsDone = dockerEventsDone
 	dry.screen = screen
+	dry.pauseMe = make(chan struct{})
+	dry.play = make(chan struct{})
 
 	widgets = initRegistry(dry)
 	viewsToHandlers = initHandlers(dry, screen)
@@ -192,7 +187,6 @@ func newDry(screen *ui.Screen, d docker.ContainerDaemon) (*Dry, error) {
 
 //NewDry creates a new dry application
 func NewDry(screen *ui.Screen, cfg Config) (*Dry, error) {
-
 	d, err := docker.ConnectToDaemon(cfg.dockerEnv())
 	if err != nil {
 		return nil, err
@@ -246,7 +240,6 @@ func refreshOnContainerEvent(w termui.Widget, daemon docker.ContainerDaemon) {
 				if err != nil {
 					return
 				}
-
 				refreshIfView(Main)
 			})
 			return nil

@@ -14,10 +14,8 @@ type hijackedIOStreamer struct {
 	inputStream  io.ReadCloser
 	outputStream io.Writer
 	errorStream  io.Writer
-
-	resp types.HijackedResponse
-
-	tty bool
+	resp         types.HijackedResponse
+	tty          bool
 }
 
 // stream handles setting up the IO and then begins streaming stdin/stdout
@@ -68,12 +66,9 @@ func (h *hijackedIOStreamer) beginInputStream() <-chan error {
 				inputDone <- fmt.Errorf("error sendStdin: %w", err)
 			}
 		}
-
 		if err := h.resp.CloseWrite(); err != nil {
 			inputDone <- fmt.Errorf("couldn't send EOF: %w", err)
-
 		}
-
 		close(inputDone)
 	}()
 

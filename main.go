@@ -11,8 +11,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	"github.com/docker/docker/pkg/term"
 	"github.com/jessevdk/go-flags"
+	"github.com/moby/term"
 	"github.com/moncho/dry/app"
 	"github.com/moncho/dry/appui"
 	"github.com/moncho/dry/docker"
@@ -173,7 +173,7 @@ func main() {
 		}()
 	}
 	// Terminal state is saved and restored on exit.
-	for _, f := range [...]*os.File{os.Stdin, os.Stdout, os.Stderr} {
+	for _, f := range [...]*os.File{os.Stdin, os.Stdout} {
 		fd, _ := term.GetFdInfo(f)
 		state, err := term.SaveState(fd)
 		if err != nil {
