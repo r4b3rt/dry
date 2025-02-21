@@ -16,14 +16,11 @@ type cMenuEventHandler struct {
 }
 
 func (h *cMenuEventHandler) handle(event *tcell.EventKey, f func(eventHandler)) {
-
 	handled := true
 	switch event.Key() {
-
 	case tcell.KeyEsc:
 		widgets.ContainerMenu.Unmount()
 		refreshScreen()
-
 	case tcell.KeyEnter:
 		err := widgets.ContainerMenu.OnEvent(func(s string) error {
 			//s is a string made of two parts: an Id and a description
@@ -53,7 +50,6 @@ func (h *cMenuEventHandler) handle(event *tcell.EventKey, f func(eventHandler)) 
 }
 
 func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f func(eventHandler)) {
-
 	dry := h.dry
 	screen := h.screen
 
@@ -92,7 +88,6 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 			refreshScreen()
 		}()
 	case docker.RESTART:
-
 		prompt := appui.NewPrompt(
 			fmt.Sprintf("Do you want to restart container %s? (y/N)", id))
 		widgets.add(prompt)
@@ -126,7 +121,6 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 		}()
 
 	case docker.STOP:
-
 		prompt := appui.NewPrompt(
 			fmt.Sprintf("Do you want to stop container %s? (y/N)", id))
 		widgets.add(prompt)
@@ -160,7 +154,6 @@ func (h *cMenuEventHandler) handleCommand(id string, command docker.Command, f f
 			refreshScreen()
 		}()
 	case docker.LOGS:
-
 		prompt := logsPrompt()
 		widgets.add(prompt)
 		forwarder := newEventForwarder()

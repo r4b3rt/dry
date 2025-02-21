@@ -3,10 +3,10 @@ package docker
 import (
 	"sort"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 )
 
-//Allowed sort methods
+// Allowed sort methods
 const (
 	NoSortImages SortMode = iota
 	SortImagesByID
@@ -15,7 +15,7 @@ const (
 	SortImagesByCreationDate
 )
 
-type apiImages []types.ImageSummary
+type apiImages []image.Summary
 
 func (s apiImages) Len() int      { return len(s) }
 func (s apiImages) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
@@ -49,8 +49,8 @@ func (s byCreationDate) Less(i, j int) bool {
 	return s.apiImages[i].Created > s.apiImages[j].Created
 }
 
-//SortImages sorts the given image slice using the given mode
-func SortImages(images []types.ImageSummary, mode SortMode) {
+// SortImages sorts the given image slice using the given mode
+func SortImages(images []image.Summary, mode SortMode) {
 	switch mode {
 	case SortImagesByID:
 		sort.Sort(byID{images})

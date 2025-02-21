@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/volume"
 	units "github.com/docker/go-units"
 	"github.com/moncho/dry/docker"
 )
@@ -19,7 +21,7 @@ const (
 	defaultDiskUsageTableFormat = "{{.Type}}\t{{.TotalCount}}\t{{.Active}}\t{{.Size}}\t{{.Reclaimable}}"
 )
 
-//DockerDiskUsageRenderer renderer for Docker disk usage
+// DockerDiskUsageRenderer renderer for Docker disk usage
 type DockerDiskUsageRenderer struct {
 	columns                []string
 	diskUsageTableTemplate *template.Template
@@ -30,7 +32,7 @@ type DockerDiskUsageRenderer struct {
 	sync.RWMutex
 }
 
-//NewDockerDiskUsageRenderer creates a DockerDiskUsageRenderer
+// NewDockerDiskUsageRenderer creates a DockerDiskUsageRenderer
 func NewDockerDiskUsageRenderer(screenHeight int) *DockerDiskUsageRenderer {
 	r := &DockerDiskUsageRenderer{}
 
@@ -47,7 +49,7 @@ func NewDockerDiskUsageRenderer(screenHeight int) *DockerDiskUsageRenderer {
 	return r
 }
 
-//PrepareToRender passes the data to be rendered
+// PrepareToRender passes the data to be rendered
 func (r *DockerDiskUsageRenderer) PrepareToRender(diskUsage *types.DiskUsage, report *docker.PruneReport) {
 	r.Lock()
 	r.diskUsage = diskUsage
@@ -58,7 +60,7 @@ func (r *DockerDiskUsageRenderer) PrepareToRender(diskUsage *types.DiskUsage, re
 	r.Unlock()
 }
 
-//Render returns the result of docker system df
+// Render returns the result of docker system df
 func (r *DockerDiskUsageRenderer) String() string {
 	r.RLock()
 	defer r.RUnlock()
@@ -181,7 +183,7 @@ func diskUsage(diskUsage *types.DiskUsage) ([]byte, error) {
 
 type diskUsageImagesContext struct {
 	totalSize int64
-	images    []*types.ImageSummary
+	images    []*image.Summary
 }
 
 func (c *diskUsageImagesContext) Type() string {
@@ -285,7 +287,7 @@ func (c *diskUsageContainersContext) Reclaimable() string {
 }
 
 type diskUsageVolumesContext struct {
-	volumes []*types.Volume
+	volumes []*volume.Volume
 }
 
 func (c *diskUsageVolumesContext) Type() string {

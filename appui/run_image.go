@@ -1,20 +1,20 @@
 package appui
 
 import (
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	gtermui "github.com/gizak/termui"
 	"github.com/moncho/dry/ui"
 	"github.com/moncho/dry/ui/termui"
 )
 
-//ImageRunWidget is an input widget to run images
+// ImageRunWidget is an input widget to run images
 type ImageRunWidget struct {
-	image types.ImageSummary
+	image image.Summary
 	termui.TextInput
 }
 
-//NewImageRunWidget creates a new ImageRunWidget for the given image
-func NewImageRunWidget(image types.ImageSummary) *ImageRunWidget {
+// NewImageRunWidget creates a new ImageRunWidget for the given image
+func NewImageRunWidget(image image.Summary) *ImageRunWidget {
 	w := &ImageRunWidget{
 		image:     image,
 		TextInput: *termui.NewTextInput(ui.ActiveScreen, ""),
@@ -32,22 +32,22 @@ func NewImageRunWidget(image types.ImageSummary) *ImageRunWidget {
 	return w
 }
 
-//Mount callback
+// Mount callback
 func (w *ImageRunWidget) Mount() error {
 	return nil
 }
 
-//Unmount callback
+// Unmount callback
 func (w *ImageRunWidget) Unmount() error {
 	return nil
 }
 
-//Name returns the widget name
+// Name returns the widget name
 func (w *ImageRunWidget) Name() string {
 	return "ImageRunWidget." + w.image.ID
 }
 
-func widgetTitle(image *types.ImageSummary) string {
+func widgetTitle(image *image.Summary) string {
 	if len(image.RepoTags) > 0 {
 		return " docker run " + image.RepoTags[0]
 	} else if len(image.RepoDigests) > 0 {

@@ -1,14 +1,13 @@
 # dry
 
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/moncho/dryblob/master/LICENSE)
-[![Build Status](https://travis-ci.org/moncho/dry.svg?branch=master)](https://travis-ci.org/moncho/dry)
-![Docker Build](https://github.com/moncho/dry/workflows/.github/workflows/docker.yml/badge.svg)
+![Build Status](https://github.com/moncho/dry/actions/workflows/go.yml/badge.svg)
+![Docker Build](https://github.com/moncho/dry/actions/workflows/docker.yml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moncho/dry)](https://goreportcard.com/report/github.com/moncho/dry)
 [![GoDoc](https://godoc.org/github.com/moncho/dry?status.svg)](https://godoc.org/github.com/moncho/dry)
-[![Coverage Status](https://coveralls.io/repos/github/moncho/dry/badge.svg?branch=master)](https://coveralls.io/github/moncho/dry?branch=master)
 [![Github All Releases](https://img.shields.io/github/downloads/moncho/dry/total.svg)]()
-[![Join the chat at https://gitter.im/moncho/dry](https://badges.gitter.im/moncho/dry.svg)](https://gitter.im/moncho/dry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Release](https://img.shields.io/github/release/moncho/dry.svg?style=flat-square)](https://github.com/moncho/dry/releases/latest)
+[![dry](https://snapcraft.io/dry/badge.svg)](https://snapcraft.io/dry)
 
 **Dry** is a terminal application to manage **Docker** and **Docker Swarm**.
 
@@ -136,10 +135,10 @@ sudo chmod 755 /usr/local/bin/dry
 
 If you dont like to **curl | sh**, binaries are provided.
 
-* **darwin** [386](https://github.com/moncho/dry/releases/download/v0.11.1/dry-darwin-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.1/dry-darwin-amd64)
-* **freebsd** [386](https://github.com/moncho/dry/releases/download/v0.11.1/dry-freebsd-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.1/dry-freebsd-amd64)
-* **linux** [386](https://github.com/moncho/dry/releases/download/v0.11.1/dry-linux-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.1/dry-linux-amd64)
-* **windows** [386](https://github.com/moncho/dry/releases/download/v0.11.1/dry-windows-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.1/dry-windows-amd64)
+* **darwin** [386](https://github.com/moncho/dry/releases/download/v0.11.2/dry-darwin-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.2/dry-darwin-amd64) / [arm64](https://github.com/moncho/dry/releases/download/v0.11.2/dry-darwin-arm64)
+* **freebsd** [386](https://github.com/moncho/dry/releases/download/v0.11.2/dry-freebsd-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.2/dry-freebsd-amd64)
+* **linux** [386](https://github.com/moncho/dry/releases/download/v0.11.2/dry-linux-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.2/dry-linux-amd64)
+* **windows** [386](https://github.com/moncho/dry/releases/download/v0.11.2/dry-windows-386) / [amd64](https://github.com/moncho/dry/releases/download/v0.11.2/dry-windows-amd64)
 
 #### Mac OS X / Homebrew
 

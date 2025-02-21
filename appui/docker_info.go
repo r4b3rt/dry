@@ -4,24 +4,22 @@ import (
 	"bytes"
 	"strconv"
 
-	termui "github.com/gizak/termui"
-	drytermui "github.com/moncho/dry/ui/termui"
-
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/api/types/system"
 	"github.com/docker/go-units"
-
+	termui "github.com/gizak/termui"
 	"github.com/moncho/dry/docker"
 	"github.com/moncho/dry/ui"
+	drytermui "github.com/moncho/dry/ui/termui"
 	"github.com/olekukonko/tablewriter"
 )
 
-//DockerInfo is a widget to show Docker info
+// DockerInfo is a widget to show Docker info
 type DockerInfo struct {
 	drytermui.SizableBufferer
 }
 
-//NewDockerInfo creates a DockerInfo widget
+// NewDockerInfo creates a DockerInfo widget
 func NewDockerInfo(daemon docker.ContainerDaemon) *DockerInfo {
 	di := drytermui.NewParFromMarkupText(DryTheme, dockerInfo(daemon))
 	di.BorderTop = false
@@ -95,7 +93,7 @@ func addSwarmInfo(rows [][]string, info swarm.Info) [][]string {
 	return [][]string{firstRow, secondRow, thirdRow}
 
 }
-func addHostInfo(rows [][]string, info types.Info) [][]string {
+func addHostInfo(rows [][]string, info system.Info) [][]string {
 	firstRow := rows[0]
 	secondRow := rows[1]
 	thirdRow := rows[2]
